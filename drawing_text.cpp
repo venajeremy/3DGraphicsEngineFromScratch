@@ -8,6 +8,8 @@ const int screenHeight=100;
 char display[screenWidth][screenHeight];
 
 
+// new change
+
 void render(){
 	for(int j = screenHeight ; j > 0 ; j=j-1){
 		//cout << "screen y: " << j << "\n";
