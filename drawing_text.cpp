@@ -15,6 +15,8 @@ float cameraYaw = 0;
 float cameraPitch = 0;
 float cameraRoll = 0;
 float fov = 3.14/2;
+int moveSpeed = 10;
+float turnSpeed = 3.14/8;
 
 // Screen/Render
 const int screenWidth=100;
@@ -93,7 +95,7 @@ int renderX(int x, int y, int z){
 	int dY = y-cameraY;	// change in y between camera and object
 	float alpha = atan2(dY, dX);// universal angle between camera and object (atan2 function is weird first input is rise, run)
 	float beta = cameraYaw;		// universal angle of camera
-	float direction = alpha-beta;   // direction of object from perspective of camera
+	float direction = fmod(alpha-beta,(3.14159f*2.0f));   // direction of object from perspective of camera
 					//
 	//cout << "returning x: " << int((direction/(fov/2))*(screenWidth/2)) << " for: ("<<x<<","<<y<<","<<z<<")\n"; 
 	// return converted angle to screen position in x
@@ -184,13 +186,17 @@ int main(){
 		cin >> action;
 
 		if(action=='w'){
-			cameraX+=10;
+			cameraX+=moveSpeed;
 		} else if(action=='s'){
-			cameraX-=10;
+			cameraX-=moveSpeed;
 		} else if(action=='a'){
-			cameraY-=10;
+			cameraY-=moveSpeed;
 		} else if(action=='d'){
-			cameraY+=10;
+			cameraY+=moveSpeed;
+		} else if(action=='l'){
+			cameraYaw+=(turnSpeed);
+		} else if(action=='j'){
+			cameraYaw-=(turnSpeed);
 		}
 
 	}
