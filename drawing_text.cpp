@@ -8,7 +8,7 @@ using namespace std;
 
 
 // Camera
-float cameraX = -100;
+float cameraX = -50;
 float cameraY = 0;
 float cameraZ = 0;
 float cameraYaw = 0;
@@ -18,7 +18,7 @@ float fov = 3.14/2;
 
 // Screen/Render
 const int screenWidth=100;
-const int screenHeight=100;
+const int screenHeight=50;
 char buffer[screenWidth*screenHeight];	// stores characters to be displayed in array
 int background = 32;	// blank character to fill spaces of buffer
 
@@ -153,15 +153,30 @@ void renderCuboid(int centerX, int centerY, int centerZ, int width, int height, 
 }
 
 int main(){
-
-	clearBuffer();
+	char action;
+	while(1){
+		clearBuffer();
 	
-	//renderLine(renderX(0, -20, 15), renderY(0,-20, 15), renderX(0, 80, -20), renderY(0, 80, -20), '#');
-	//renderLine(80, 80, 10, 80, 'T');
+		//renderLine(renderX(0, -20, 15), renderY(0,-20, 15), renderX(0, 80, -20), renderY(0, 80, -20), '#');
+		//renderLine(80, 80, 10, 80, 'T');
 	
-	renderCuboid(30, 0, 0, 50, 50, 50, '@');
+		renderCuboid(30, 0, 0, 50, 50, 50, '@');
 
-	//renderQuad(10, 10, 80, 10, 80, 80, 10, 80, 'P');
-	renderBuffer();
+		//renderQuad(10, 10, 80, 10, 80, 80, 10, 80, 'P');
+		renderBuffer();
+		
+		cin >> action;
+
+		if(action=='w'){
+			cameraX+=10;
+		} else if(action=='s'){
+			cameraX-=10;
+		} else if(action=='a'){
+			cameraY-=10;
+		} else if(action=='d'){
+			cameraY+=10;
+		}
+
+	}
 	return 0;
 }
