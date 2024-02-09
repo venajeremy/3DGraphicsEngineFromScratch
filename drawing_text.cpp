@@ -22,6 +22,7 @@ const int screenHeight=50;
 char buffer[screenWidth*screenHeight];	// stores characters to be displayed in array
 int background = 32;	// blank character to fill spaces of buffer
 
+// Render buffer: iterates through the buffer arry and writes the characters within it to the console; prints new lines at screen width
 
 void renderBuffer(){
 	
@@ -35,9 +36,14 @@ void renderBuffer(){
 	putchar('\n');
 }
 
+// Clear buffer: Resets the buffer to blank characters
+
 void clearBuffer(){
 	memset(buffer, background, screenWidth * screenHeight);
 }
+
+// Render line: Draws a line on the buffer, starts at x1 y1 follows to y2 along slope (slightly inaccurate but idgaf)
+
 void renderLine(int x1, int y1, int x2, int y2, char h){
 	int dy = (y2-y1);
 	int dx = (x2-x1);
@@ -69,6 +75,8 @@ void renderLine(int x1, int y1, int x2, int y2, char h){
 	
 }
 
+// Render quad: just uses the renderLine function to draw a quad
+
 void renderQuad(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, char h){
 	//cout << "Rendering quad with points: (" << x1 << ", " << y1 << "), (" << x2 << ", " << y2 << "), (" << x3 << ", " << y3 << "), (" << x4 << ", " << y4 << ")\n";
 	renderLine(x1, y1, x2, y2, h);
@@ -77,6 +85,8 @@ void renderQuad(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, 
 	renderLine(x4, y4, x1, y1, h);
 
 }
+
+// Takes 3space coordinates as input, returns a position on screen with respect to camera's position and direction
 
 int renderX(int x, int y, int z){
 	int dX = x-cameraX;	// change in x between camera and object
@@ -89,6 +99,8 @@ int renderX(int x, int y, int z){
 	// return converted angle to screen position in x
 	return(int((direction/(fov/2))*(screenWidth/2))+(screenWidth/2));
 }
+
+// Similar to function above but to find y position
 
 int renderY(int x, int y, int z){
 	int dX = x-cameraX;	// change in x between camera and object
@@ -103,6 +115,8 @@ int renderY(int x, int y, int z){
 	//cout << "returning y: " << int((direction/(fov/2))*(screenHeight/2)) << " for: ("<<x<<","<<y<<","<<z<<")\n"; 
 	return(int((direction/(fov/2))*(screenHeight/2))+(screenHeight/2));
 }
+
+// Takes position and sizes as input, creates 8 points and renders quads between them
 
 void renderCuboid(int centerX, int centerY, int centerZ, int width, int height, int length, char h){
 	
@@ -151,6 +165,8 @@ void renderCuboid(int centerX, int centerY, int centerZ, int width, int height, 
 	renderQuad(x1, y1, x4, y4, x8, y8, x5, y5, h);//1 4 8 5
 
 }
+
+//------------------------------------Main Function------------------------------------//
 
 int main(){
 	char action;
