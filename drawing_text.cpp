@@ -53,12 +53,16 @@ void renderLine(int x1, int y1, int x2, int y2, char h){
 	if(dy==0){	// cant find slope if dy==0 must be a orizontal line at y1
 		if(x1<x2){
 			for(int i=x1; i<x2;i++){
-				buffer[(y1*screenWidth)+i] = h;
+				if(y1>0&&y1<screenHeight&&i>0&&i<screenWidth){
+					buffer[(y1*screenWidth)+i] = h;
+				}
 			}
 			return;
 		} else {
 			for(int i=x2; i<x1;i++){
-				buffer[(y1*screenWidth)+i] = h;
+				if(y1>0&&y1<screenHeight&&i>0&&i<screenWidth){
+					buffer[(y1*screenWidth)+i] = h;
+				}
 			}
 			return;
 		}
@@ -67,11 +71,15 @@ void renderLine(int x1, int y1, int x2, int y2, char h){
 	int run = dx/dy;
 	if(dy>0){	// if line is going up
 		for(int i=0; i<dy; i++){
-			buffer[((y1+i)*screenWidth)+x1+(i*run)] = h;	// i*screenWidth gets right position in y, i*run stands for the x position
+			if(y1>(0-i)&&y1<(screenHeight-i)&&x1>(0-(i*run))&&x1<(screenWidth-i*run)){
+				buffer[((y1+i)*screenWidth)+x1+(i*run)] = h;	// i*screenWidth gets right position in y, i*run stands for the x position
+			}
 		}
 	} else if (dy<0) {
 		for(int i=0; i>dy; i--){
-			buffer[((y1+i)*screenWidth)+x1+(i*run)] = h;	// i*screenWidth gets right position in y, i*run stands for the x position
+			if(y1>(0-i)&&y1<(screenHeight-i)&&x1>(0-(i*run))&&x1<(screenWidth-i*run)){
+				buffer[((y1+i)*screenWidth)+x1+(i*run)] = h;	// i*screenWidth gets right position in y, i*run stands for the x position
+			}
 		}
 	}
 	
@@ -184,15 +192,21 @@ int main(){
 		renderBuffer();
 		
 		cin >> action;
-
+		
 		if(action=='w'){
-			cameraX+=moveSpeed;
+			cameraX+=(cos(cameraYaw)*moveSpeed);
+			cameraY+=(sin(cameraYaw)*moveSpeed);
+
 		} else if(action=='s'){
-			cameraX-=moveSpeed;
+			cameraX-=(cos(cameraYaw)*moveSpeed);
+			cameraY-=(sin(cameraYaw)*moveSpeed);
+
 		} else if(action=='a'){
-			cameraY-=moveSpeed;
+			cameraY-=(cos(cameraYaw)*moveSpeed);
+			cameraX+=(sin(cameraYaw)*moveSpeed);
 		} else if(action=='d'){
-			cameraY+=moveSpeed;
+			cameraY+=(cos(cameraYaw)*moveSpeed);
+			cameraX-=(sin(cameraYaw)*moveSpeed);
 		} else if(action=='l'){
 			cameraYaw+=(turnSpeed);
 		} else if(action=='j'){
