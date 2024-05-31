@@ -14,26 +14,29 @@ Application::Application()
 		return;
 	}
 
-	m_window_surface = SDL_GetWindowSurface(m_window);
+	m_render = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED);
 
-	if(!m_window_surface)
+	if(!m_render)
 	{
-
-		std::cout << "Failed to get window's surface\n";
+		std::cout << "Failed to get window's renderer\n";
 		std::cout << "SDL2 Error: " << SDL_GetError() << "\n";
 		return;
 	}
 
-	m_image = load_surface("stickman.bmp");
+	newCamera = new World(m_render, (M_PI/2), 680, 480);
+	
+
+	draw();
 }
 
 Application::~Application()
 {
-	SDL_FreeSurface(m_window_surface);
+	delete newCamera;
+	SDL_DestroyRenderer(m_render);
 	SDL_DestroyWindow(m_window);
 }
 
-void Application::update()
+void Application::loop()
 {
 	bool keep_window_open = true;
 	while(keep_window_open)
@@ -43,18 +46,38 @@ void Application::update()
 			switch(m_window_event.type)
 			{
 				case SDL_QUIT:
+					std::cout << "Quitting\n";
 					keep_window_open = false;
 					break;
 			}
 		}
-
-
-		draw();
+		//update(1.0/60.0);
+		//draw();
 	}
+}
+
+void Application::update(double delta_time)
+{
+	zChange = zChange+1;	
 }
 
 void Application::draw()
 {
-	SDL_BlitSurface(m_image, NULL, m_window_surface, NULL);
-	SDL_UpdateWindowSurface(m_window);
+	// Clear Renderer
+	SDL_SetRenderDrawColor(m_render, 0, 0, 0, 255);
+	SDL_RenderClear(m_render);
+	
+	// Drawing Process
+	SDL_SetRenderDrawColor(m_render, 242, 242, 242, 255);
+	newCamera->renderTriPolygon(20, 20, 100, 25, -30, 95, -30, 5, 102);
+	newCamera->renderTriPolygon(20, 20, 90, 25, -30, 85, -30, 5, 92);
+	newCamera->renderTriPolygon(20, 20, 80, 25, -30, 75, -30, 5, 82);
+	newCamera->renderTriPolygon(20, 20, 70, 25, -30, 65, -30, 5, 72);
+	newCamera->renderTriPolygon(20, 20, 60, 25, -30, 55, -30, 5, 62);
+	newCamera->renderTriPolygon(20, 20, 50, 25, -30, 45, -30, 5, 52);
+
+	//SDL_RenderDrawLine(m_render, 10, 10, 100, 100);
+
+	// Display Updates
+	SDL_RenderPresent(m_render);
 }
