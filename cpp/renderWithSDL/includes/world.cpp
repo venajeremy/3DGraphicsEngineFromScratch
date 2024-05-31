@@ -1,8 +1,7 @@
 #include "world.hpp"
-#include <tuple>
 
 World::World(SDL_Renderer *inputRenderer, double inputCameraFov, int displayX, int displayY){
-	renderer = &inputRenderer;
+	renderer = inputRenderer;
 	cameraFov = inputCameraFov;
 	disX = displayX;
 	disY = displayY;
@@ -35,12 +34,12 @@ void World::renderTriPolygon(int x1, int y1, int z1,
 	std::tuple<double, double> p3 = renderPointRelative(x3, y3, z3);
 
 	// p1 to p2
-	SDL_RenderDrawLine(*renderer,std::get<0>(p1),std::get<1>(p1),std::get<0>(p2),std::get<1>(p2));
+	SDL_RenderDrawLine(renderer,std::get<0>(p1),std::get<1>(p1),std::get<0>(p2),std::get<1>(p2));
 
 	// p2 to p3
-	SDL_RenderDrawLine(*renderer,std::get<0>(p2),std::get<1>(p2),std::get<0>(p3),std::get<1>(p3));
+	SDL_RenderDrawLine(renderer,std::get<0>(p2),std::get<1>(p2),std::get<0>(p3),std::get<1>(p3));
 
 	// p3 to p1
-	SDL_RenderDrawLine(*renderer,std::get<0>(p3),std::get<1>(p3),std::get<0>(p1),std::get<1>(p1));	
+	SDL_RenderDrawLine(renderer,std::get<0>(p3),std::get<1>(p3),std::get<0>(p1),std::get<1>(p1));	
 	
 }

@@ -5,7 +5,7 @@ Application::Application()
 	m_window = SDL_CreateWindow("SDL2 Window",
 			SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED,
-			680, 480,
+			1440, 960,
 			0);
 	if(!m_window)
 	{
@@ -23,10 +23,12 @@ Application::Application()
 		return;
 	}
 
-	newCamera = new World(m_render, (M_PI/2), 680, 480);
+	newCamera = new World(m_render, (M_PI/2), 1440, 960);
 	
 
 	draw();
+	zChange = 0;
+	
 }
 
 Application::~Application()
@@ -51,14 +53,15 @@ void Application::loop()
 					break;
 			}
 		}
-		//update(1.0/60.0);
-		//draw();
+		update(1000.0/240.0);
+		draw();
 	}
 }
 
 void Application::update(double delta_time)
 {
-	zChange = zChange+1;	
+	SDL_Delay(delta_time);
+	zChange = zChange-(0.01);	
 }
 
 void Application::draw()
@@ -69,12 +72,7 @@ void Application::draw()
 	
 	// Drawing Process
 	SDL_SetRenderDrawColor(m_render, 242, 242, 242, 255);
-	newCamera->renderTriPolygon(20, 20, 100, 25, -30, 95, -30, 5, 102);
-	newCamera->renderTriPolygon(20, 20, 90, 25, -30, 85, -30, 5, 92);
-	newCamera->renderTriPolygon(20, 20, 80, 25, -30, 75, -30, 5, 82);
-	newCamera->renderTriPolygon(20, 20, 70, 25, -30, 65, -30, 5, 72);
-	newCamera->renderTriPolygon(20, 20, 60, 25, -30, 55, -30, 5, 62);
-	newCamera->renderTriPolygon(20, 20, 50, 25, -30, 45, -30, 5, 52);
+	newCamera->renderTriPolygon(20, 20, 100+zChange, 25, -30, 95+zChange, -30, 5, 102+zChange);
 
 	//SDL_RenderDrawLine(m_render, 10, 10, 100, 100);
 

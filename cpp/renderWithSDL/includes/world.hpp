@@ -3,6 +3,7 @@
 #include <math.h>
 #include <iostream>
 #include <SDL2/SDL.h>
+#include <tuple>
 
 class World
 {
@@ -14,7 +15,7 @@ public:
 			int x3, int y3, int z3);
 private:
 	std::tuple<double, double> renderPointRelative(double ix,double iy,double iz);
-	SDL_Renderer **renderer;
+	SDL_Renderer *renderer;
 	double cameraFov;
 	int disX;
 	int disY;
