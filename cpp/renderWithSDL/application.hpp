@@ -22,5 +22,4 @@ private:
 	
 	World	*newCamera;
 
-	double	zChange;
 };

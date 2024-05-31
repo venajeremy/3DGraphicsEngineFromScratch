@@ -27,7 +27,6 @@ Application::Application()
 	
 
 	draw();
-	zChange = 0;
 	
 }
 
@@ -43,8 +42,11 @@ void Application::loop()
 	bool keep_window_open = true;
 	while(keep_window_open)
 	{
+		// Handle Input
 		while(SDL_PollEvent(&m_window_event) > 0)
 		{
+			// Give input to worlds
+			newCamera->handleInput(m_window_event);
 			switch(m_window_event.type)
 			{
 				case SDL_QUIT:
@@ -53,6 +55,7 @@ void Application::loop()
 					break;
 			}
 		}
+		// Should run at 240 fps?
 		update(1000.0/240.0);
 		draw();
 	}
@@ -61,7 +64,8 @@ void Application::loop()
 void Application::update(double delta_time)
 {
 	SDL_Delay(delta_time);
-	zChange = zChange-(0.01);	
+	// Take action
+		
 }
 
 void Application::draw()
@@ -72,9 +76,14 @@ void Application::draw()
 	
 	// Drawing Process
 	SDL_SetRenderDrawColor(m_render, 242, 242, 242, 255);
-	newCamera->renderTriPolygon(20, 20, 100+zChange, 25, -30, 95+zChange, -30, 5, 102+zChange);
+	newCamera->renderTriPolygon(20, 20, 100, -20, 20, 100, -20, -20, 100);
+	newCamera->renderTriPolygon(20, 20, 100, 20, -20, 100, 20, -20, 120);
+	newCamera->renderTriPolygon(20, -20, 100, -20, -20, 100, -20, -20, 120);
+	newCamera->renderTriPolygon(20, 20, 100, -20, 20, 120, 20, 20, 120);
+	newCamera->renderTriPolygon(-20, 20, 100, -20, 20, 120, -20, -20, 120);
+	newCamera->renderTriPolygon(-20, -20, 120, 20, -20, 120, 20, 20, 120);
 
-	//SDL_RenderDrawLine(m_render, 10, 10, 100, 100);
+
 
 	// Display Updates
 	SDL_RenderPresent(m_render);

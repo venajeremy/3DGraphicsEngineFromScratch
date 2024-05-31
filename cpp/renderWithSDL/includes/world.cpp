@@ -5,6 +5,28 @@ World::World(SDL_Renderer *inputRenderer, double inputCameraFov, int displayX, i
 	cameraFov = inputCameraFov;
 	disX = displayX;
 	disY = displayY;
+	movementSpeed = 5;
+	cameraX = 0;
+	cameraY = 0;
+	cameraZ = 0;
+}
+
+void World::handleInput(SDL_Event const &event){
+	switch(event.type)
+	{
+		case SDL_KEYDOWN:
+			Uint8 const *keys = SDL_GetKeyboardState(nullptr);
+			if(keys[SDL_SCANCODE_W] == 1)
+				cameraZ = cameraZ+movementSpeed;
+			else if(keys[SDL_SCANCODE_S] == 1)
+				cameraZ = cameraZ-movementSpeed;
+			else if(keys[SDL_SCANCODE_A] == 1)
+				cameraX = cameraX-movementSpeed;
+			else if(keys[SDL_SCANCODE_D] == 1)
+				cameraX = cameraX+movementSpeed;
+			break;
+
+	}
 }
 
 std::tuple<double, double> World::renderPointRelative(double ix,double iy,double iz)
@@ -13,9 +35,9 @@ std::tuple<double, double> World::renderPointRelative(double ix,double iy,double
 	// Fix this later (vertex is behind camera it is ignored)
 	if(iz>0)
 	{
-		double xAngle = atan(ix/iz);
+		double xAngle = atan((ix-cameraX)/(iz-cameraZ));
 		
-		double yAngle = atan(iy/iz);
+		double yAngle = atan((-iy-cameraY)/(iz-cameraZ));
 
 		return std::make_tuple(disX*(((cameraFov/2)+xAngle)/cameraFov),disY*(((cameraFov/2)+yAngle)/cameraFov));
 	} else {
