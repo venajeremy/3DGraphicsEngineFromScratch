@@ -1,0 +1,43 @@
+World class:
+
+represents a camera's perspective in a given world
+
+Contains the methods to render 3d points with the constraints of the given camera
+
+Responsible for input
+
+Holds vector of all objects
+
+
+
+
+
+Object class:
+
+represents a single object in a single given world
+
+has position respective to given world (directly changed by movement and rotation input)
+
+has vertexes respective to origin
+
+describes surfaces between vertexes
+
+
+
+
+Steps of rendering object:
+
+For every surface (rendering surfaces to be displayed / zbuffer)
+	Find 3d coords of vertexes by adding global to relative (account for rotation in relative)
+	If any Z coordinate of a vertex is less than 0 (behind camera) go to the next surface
+	Find 2d coords of each vertex
+	Find bounding box of all vertexes of surface
+	Start at corner of bounding box (within the display view)
+	Check pixel is within surface (if not skip next pixel)
+	Check the Z buffer
+		If all points of surface have a z value less than the current zbuffer position skip pixel
+		If any point of surface has z value greater than current zbuffer position calculate the z value at that point on surface
+		If the calculated z value on surface is also greater than current z buffer update the z buffer with the z value and the surface
+	
+Render textures onto zBuffer
+		

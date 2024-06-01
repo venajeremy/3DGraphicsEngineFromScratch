@@ -22,7 +22,10 @@ private:
 	double cameraX;
 	double cameraY;
 	double cameraZ;
+	double cameraYaw;
+	double cameraPitch;
 	double movementSpeed;
+	double sensitivity;
 	int disX;
 	int disY;
 };

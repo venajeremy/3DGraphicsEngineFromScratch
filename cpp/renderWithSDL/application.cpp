@@ -23,7 +23,7 @@ Application::Application()
 		return;
 	}
 
-	newCamera = new World(m_render, (M_PI/2), 1440, 960);
+	newCamera = new World(m_render, (2*M_PI/5), 1440, 960);
 	
 
 	draw();

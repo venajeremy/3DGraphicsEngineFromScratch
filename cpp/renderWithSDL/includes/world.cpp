@@ -9,11 +9,21 @@ World::World(SDL_Renderer *inputRenderer, double inputCameraFov, int displayX, i
 	cameraX = 0;
 	cameraY = 0;
 	cameraZ = 0;
+	cameraYaw = 0;
+	cameraPitch = 0;
+	sensitivity = 0.005;
+
+	// Make Mouse Movement Relative
+	SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
 void World::handleInput(SDL_Event const &event){
 	switch(event.type)
 	{
+		case SDL_MOUSEMOTION:
+			cameraYaw = cameraYaw-(event.motion.xrel*sensitivity);
+			cameraPitch = cameraPitch-(event.motion.yrel*sensitivity);
+			std::cout << cameraYaw << "\n";
 		case SDL_KEYDOWN:
 			Uint8 const *keys = SDL_GetKeyboardState(nullptr);
 			if(keys[SDL_SCANCODE_W] == 1)
@@ -49,6 +59,7 @@ void World::renderTriPolygon(int x1, int y1, int z1,
 		int x2, int y2, int z2,
 		int x3, int y3, int z3)
 {
+	
 	// Given Coordinates are relative to camera
 	// z axis is horizontal to forward direction (when viewed from above)
 	std::tuple<double, double> p1 = renderPointRelative(x1, y1, z1);
