@@ -1,6 +1,6 @@
 #include "world.hpp"
 
-World::World(SDL_Renderer *inputRenderer, double inputCameraFov, int displayX, int displayY){
+World::World(SDL_Renderer *inputRenderer, float inputCameraFov, int displayX, int displayY){
 	renderer = inputRenderer;
 	cameraFov = inputCameraFov;
 	disX = displayX;
@@ -39,21 +39,21 @@ void World::handleInput(SDL_Event const &event){
 	}
 }
 
-std::tuple<double, double> World::renderPointRelative(double ix,double iy,double iz)
+std::tuple<float , float > World::renderPointRelative(float  ix,float  iy,float  iz)
 {
 	// Given Coorinates are relative to camera
 	// Fix this later (vertex is behind camera it is ignored)
 	if(iz>0)
 	{
-		double xAngle = atan((ix-cameraX)/(iz-cameraZ));
+		float xAngle = atan((ix-cameraX)/(iz-cameraZ));
 		
-		double yAngle = atan((-iy-cameraY)/(iz-cameraZ));
+		float yAngle = atan((-iy-cameraY)/(iz-cameraZ));
 
 		return std::make_tuple(disX*(((cameraFov/2)+xAngle)/cameraFov),disY*(((cameraFov/2)+yAngle)/cameraFov));
 	} else {
 		return std::make_tuple(-1, -1);
 	}
-}
+} 
 
 void World::renderTriPolygon(int x1, int y1, int z1,
 		int x2, int y2, int z2,
@@ -62,9 +62,9 @@ void World::renderTriPolygon(int x1, int y1, int z1,
 	
 	// Given Coordinates are relative to camera
 	// z axis is horizontal to forward direction (when viewed from above)
-	std::tuple<double, double> p1 = renderPointRelative(x1, y1, z1);
-	std::tuple<double, double> p2 = renderPointRelative(x2, y2, z2);
-	std::tuple<double, double> p3 = renderPointRelative(x3, y3, z3);
+	std::tuple<float , float > p1 = renderPointRelative(x1, y1, z1);
+	std::tuple<float , float > p2 = renderPointRelative(x2, y2, z2);
+	std::tuple<float , float > p3 = renderPointRelative(x3, y3, z3);
 
 	// p1 to p2
 	SDL_RenderDrawLine(renderer,std::get<0>(p1),std::get<1>(p1),std::get<0>(p2),std::get<1>(p2));
@@ -75,4 +75,14 @@ void World::renderTriPolygon(int x1, int y1, int z1,
 	// p3 to p1
 	SDL_RenderDrawLine(renderer,std::get<0>(p3),std::get<1>(p3),std::get<0>(p1),std::get<1>(p1));	
 	
+}
+
+void World::renderObject(Object object)
+{
+    mesh = object.getMesh();
+    for(auto surface = mesh.begin(); surface != mesh.end(); ++surface) {
+        World::renderTriPolygon(surface->vertices[0], surface->vertices[3], surface->vertices[6],
+                            surface->vertices[1], surface->vertices[4], surface->vertices[7],
+                            surface->vertices[2], surface->vertices[5], surface->vertices[8]);
+    }
 }

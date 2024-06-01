@@ -4,6 +4,7 @@
 #include <iostream>
 #include "window.hpp"
 #include "./includes/world.hpp"
+#include "./includes/object.hpp"
 
 class Application
 {
@@ -21,5 +22,7 @@ private:
 	SDL_Event	m_window_event;
 	
 	World	*newCamera;
+
+    Object   *cube;
 
 };
