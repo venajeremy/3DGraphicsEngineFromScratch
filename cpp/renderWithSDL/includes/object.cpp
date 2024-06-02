@@ -53,13 +53,13 @@ std::vector<Surface> Object::getMesh()
     for(auto it = returnMesh.begin(); it != returnMesh.end(); ++it) {
         // Add in portion to compensite for object rotation later (axis of rotation should be 0,0,0)
         it->vertices[0] += posX;
-        it->vertices[1] += posX;
-        it->vertices[2] += posX;
-        it->vertices[3] += posY;
+        it->vertices[1] += posY;
+        it->vertices[2] += posZ;
+        it->vertices[3] += posX;
         it->vertices[4] += posY;
-        it->vertices[5] += posY;
-        it->vertices[6] += posZ;
-        it->vertices[7] += posZ;
+        it->vertices[5] += posZ;
+        it->vertices[6] += posX;
+        it->vertices[7] += posY;
         it->vertices[8] += posZ;
     }
 
@@ -71,7 +71,7 @@ std::vector<Surface> Object::getMesh()
 Surface::Surface(std::array<float,9> inVerticies)
 {
     // color in form r, g, b, alpha
-    // verties in form x1,x2,x3,y1,y2,y3,z1,z2,z3
+    // verties in form x1,y1,z1,x2,y2,z3,x3,y3,z3
     vertices = inVerticies;
     //color = inColor;
 }

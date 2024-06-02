@@ -40,4 +40,14 @@ For every surface (rendering surfaces to be displayed / zbuffer)
 		If the calculated z value on surface is also greater than current z buffer update the z buffer with the z value and the surface
 	
 Render textures onto zBuffer
-		
+
+
+
+
+TODO:
+
+Add mouse movement
+
+Organize
+
+Create functions for rasterization

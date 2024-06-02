@@ -5,13 +5,13 @@ World::World(SDL_Renderer *inputRenderer, float inputCameraFov, int displayX, in
 	cameraFov = inputCameraFov;
 	disX = displayX;
 	disY = displayY;
-	movementSpeed = 5;
-	cameraX = 0;
-	cameraY = 0;
-	cameraZ = 0;
-	cameraYaw = 0;
-	cameraPitch = 0;
-	sensitivity = 0.005;
+	movementSpeed = 5.0f;
+	cameraX = 0.0f;
+	cameraY = 0.0f;
+	cameraZ = 0.0f;
+	cameraYaw = 0.0f;
+	cameraPitch = 0.0f;
+	sensitivity = 0.05f;
 
 	// Make Mouse Movement Relative
 	SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -23,18 +23,20 @@ void World::handleInput(SDL_Event const &event){
 		case SDL_MOUSEMOTION:
 			cameraYaw = cameraYaw-(event.motion.xrel*sensitivity);
 			cameraPitch = cameraPitch-(event.motion.yrel*sensitivity);
+
 			std::cout << cameraYaw << "\n";
 		case SDL_KEYDOWN:
 			Uint8 const *keys = SDL_GetKeyboardState(nullptr);
-			if(keys[SDL_SCANCODE_W] == 1)
+			if(keys[SDL_SCANCODE_W] == 1){
 				cameraZ = cameraZ+movementSpeed;
-			else if(keys[SDL_SCANCODE_S] == 1)
+            }else if(keys[SDL_SCANCODE_S] == 1){
 				cameraZ = cameraZ-movementSpeed;
-			else if(keys[SDL_SCANCODE_A] == 1)
+            }else if(keys[SDL_SCANCODE_A] == 1){
 				cameraX = cameraX-movementSpeed;
-			else if(keys[SDL_SCANCODE_D] == 1)
+            }else if(keys[SDL_SCANCODE_D] == 1){
 				cameraX = cameraX+movementSpeed;
-			break;
+            }
+            break;
 
 	}
 }
@@ -45,9 +47,9 @@ std::tuple<float , float > World::renderPointRelative(float  ix,float  iy,float 
 	// Fix this later (vertex is behind camera it is ignored)
 	if(iz>0)
 	{
-		float xAngle = atan((ix-cameraX)/(iz-cameraZ));
+		float xAngle = atan((ix)/(iz));
 		
-		float yAngle = atan((-iy-cameraY)/(iz-cameraZ));
+		float yAngle = atan((-iy)/(iz));
 
 		return std::make_tuple(disX*(((cameraFov/2)+xAngle)/cameraFov),disY*(((cameraFov/2)+yAngle)/cameraFov));
 	} else {
@@ -81,8 +83,8 @@ void World::renderObject(Object object)
 {
     mesh = object.getMesh();
     for(auto surface = mesh.begin(); surface != mesh.end(); ++surface) {
-        World::renderTriPolygon(surface->vertices[0], surface->vertices[3], surface->vertices[6],
-                            surface->vertices[1], surface->vertices[4], surface->vertices[7],
-                            surface->vertices[2], surface->vertices[5], surface->vertices[8]);
+        World::renderTriPolygon(surface->vertices[0], surface->vertices[1], surface->vertices[2],
+                            surface->vertices[3], surface->vertices[4], surface->vertices[5],
+                            surface->vertices[6], surface->vertices[7], surface->vertices[8]);
     }
 }

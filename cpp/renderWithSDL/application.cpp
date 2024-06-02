@@ -23,23 +23,22 @@ Application::Application()
 		return;
 	}
 
+    // Create new world
 	newCamera = new World(m_render, (2*M_PI/5), 1440, 960);
 	
-    Surface s1({20.0f, 20.0f, 20.0f, -20.0f, 20.0f, 20.0f, -20.0f, -20.0f, 20.0f});
-    Surface s2({20.0f, 20.0f, 20.0f, 20.0f, -20.0f, 20.0f, 20.0f, -20.0f, 20.0f});
-    Surface s3({20.0f, 20.0f, 20.0f, -20.0f, 20.0f, 20.0f, -20.0f, -20.0f, 20.0f});
-    Surface s4({20.0f, 20.0f, 20.0f, -20.0f, 20.0f, 20.0f, 20.0f, 20.0f, 20.0f});
-    Surface s5({-20.0f, 20.0f, 20.0f, -20.0f, 20.0f, 20.0f, -20.0f, -20.0f, 20.0f});
+
+    // Create new object
+    Surface s1({20.0f, 20.0f, -20.0f, -20.0f, 20.0f, -20.0f, -20.0f, -20.0f, -20.0f});
+    Surface s2({20.0f, 20.0f, -20.0f, 20.0f, -20.0f, -20.0f, 20.0f, -20.0f, 20.0f});
+    Surface s3({20.0f, 20.0f, -20.0f, 20.0f, 20.0f, 20.0f, -20.0f, 20.0f, 20.0f});
+    Surface s4({-20.0f, 20.0f, -20.0f, -20.0f, 20.0f, 20.0f, -20.0f, -20.0f, 20.0f});
+    Surface s5({20.0f, -20.0f, -20.0f, -20.0f, -20.0f, -20.0f, -20.0f, -20.0f, 20.0f});
     Surface s6({-20.0f, -20.0f, 20.0f, 20.0f, -20.0f, 20.0f, 20.0f, 20.0f, 20.0f});
 
-
-     // Create mesh for our new object
     std::vector<Surface> mesh({s1, s2, s3, s4, s5, s6});
 
     cube = new Object(mesh, 0, 0, 100, 0, 0, 0);
 
-	draw();
-	
 }
 
 Application::~Application()
