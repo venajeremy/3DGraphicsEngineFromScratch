@@ -22,7 +22,7 @@ public:
     
     void worldTranslate(float dX, float dY, float dZ);
     void worldRotate(float dYaw, float dPitch, float dRoll);
-
+    void objectRotate(float dYaw, float dPitch, float dRoll);
     std::vector<Surface> getMesh();
 
 private:

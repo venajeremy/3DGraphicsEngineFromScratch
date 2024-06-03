@@ -11,8 +11,7 @@ World::World(SDL_Renderer *inputRenderer, float inputCameraFov, int displayX, in
 	cameraZ = 0.0f;
 	cameraYaw = 0.0f;
 	cameraPitch = 0.0f;
-	sensitivity = 0.05f;
-
+	sensitivity = 0.005f;
 	// Make Mouse Movement Relative
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 }
@@ -21,24 +20,41 @@ void World::handleInput(SDL_Event const &event){
 	switch(event.type)
 	{
 		case SDL_MOUSEMOTION:
-			cameraYaw = cameraYaw-(event.motion.xrel*sensitivity);
-			cameraPitch = cameraPitch-(event.motion.yrel*sensitivity);
-
+            dY = event.motion.xrel*sensitivity;
+            dP = event.motion.yrel*sensitivity;
+			cameraYaw = cameraYaw-dY;
+			cameraPitch = cameraPitch-dP;
+            handleRotation(dY,dP, 0);
 			std::cout << cameraYaw << "\n";
 		case SDL_KEYDOWN:
 			Uint8 const *keys = SDL_GetKeyboardState(nullptr);
 			if(keys[SDL_SCANCODE_W] == 1){
-				cameraZ = cameraZ+movementSpeed;
+                handleMovement(0, 0, movementSpeed);
             }else if(keys[SDL_SCANCODE_S] == 1){
-				cameraZ = cameraZ-movementSpeed;
+				handleMovement(0, 0, -movementSpeed);
             }else if(keys[SDL_SCANCODE_A] == 1){
-				cameraX = cameraX-movementSpeed;
+				handleMovement(-movementSpeed, 0, 0);
             }else if(keys[SDL_SCANCODE_D] == 1){
-				cameraX = cameraX+movementSpeed;
+				handleMovement(movementSpeed, 0, 0);
             }
             break;
 
 	}
+}
+
+void World::handleMovement(float dX, float dY, float dZ){
+    //Move every object in world
+    for(auto obj = objects.begin(); obj != objects.end(); obj++) {
+        obj->worldTranslate(dX,dY,dZ);
+    }
+}
+
+void World::handleRotation(float dYaw, float dPitch, float dRoll){
+    //Rotate every object in world around camera
+    for(auto obj = objects.begin(); obj != objects.end(); obj++) {
+        obj->worldRotate(dYaw,dPitch,dRoll);
+    }
+
 }
 
 std::tuple<float , float > World::renderPointRelative(float  ix,float  iy,float  iz)
@@ -47,9 +63,9 @@ std::tuple<float , float > World::renderPointRelative(float  ix,float  iy,float 
 	// Fix this later (vertex is behind camera it is ignored)
 	if(iz>0)
 	{
-		float xAngle = atan((ix)/(iz));
+		float xAngle = (ix)/(iz);
 		
-		float yAngle = atan((-iy)/(iz));
+		float yAngle = (-iy)/(iz);
 
 		return std::make_tuple(disX*(((cameraFov/2)+xAngle)/cameraFov),disY*(((cameraFov/2)+yAngle)/cameraFov));
 	} else {
@@ -83,8 +99,23 @@ void World::renderObject(Object object)
 {
     mesh = object.getMesh();
     for(auto surface = mesh.begin(); surface != mesh.end(); ++surface) {
-        World::renderTriPolygon(surface->vertices[0], surface->vertices[1], surface->vertices[2],
+        // Only render object if it is infront of the camera (these positions are relative)
+        if(surface->vertices[2]>0.0f && surface->vertices[5]>0.0f && surface->vertices[8]>0.0f){
+            World::renderTriPolygon(surface->vertices[0], surface->vertices[1], surface->vertices[2],
                             surface->vertices[3], surface->vertices[4], surface->vertices[5],
                             surface->vertices[6], surface->vertices[7], surface->vertices[8]);
+        }
+    }
+}
+
+void World::addObject(Object object)
+{
+    objects.push_back(object);
+}
+
+void World::renderWorld()
+{
+    for(auto obj = objects.begin(); obj != objects.end(); obj++) {
+        renderObject(*obj);
     }
 }

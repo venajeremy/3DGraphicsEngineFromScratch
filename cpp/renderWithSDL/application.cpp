@@ -39,6 +39,8 @@ Application::Application()
 
     cube = new Object(mesh, 0, 0, 100, 0, 0, 0);
 
+    newCamera->addObject(*cube);
+
 }
 
 Application::~Application()
@@ -88,7 +90,7 @@ void Application::draw()
 	
 	// Drawing Process
 	SDL_SetRenderDrawColor(m_render, 242, 242, 242, 255);
-    newCamera->renderObject(*cube);
+    newCamera->renderWorld();
 
 
 	// Display Updates
