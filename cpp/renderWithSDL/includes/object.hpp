@@ -8,9 +8,9 @@
 class Surface
 {
 public:
-    Surface(std::array<float,9> inVerticies);
+    Surface(std::array<float,9> inVerticies, std::array<float,4> color);
     std::array<float,9> vertices;
-    std::array<float,4> color;
+    float color[4];
 private:
      
 };

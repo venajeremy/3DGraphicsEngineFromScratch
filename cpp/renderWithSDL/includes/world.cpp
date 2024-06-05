@@ -1,10 +1,16 @@
 #include "world.hpp"
+#include "object.hpp"
 
 World::World(SDL_Renderer *inputRenderer, float inputCameraFov, int displayX, int displayY){
 	renderer = inputRenderer;
 	cameraFov = inputCameraFov;
 	disX = displayX;
 	disY = displayY;
+
+    // Initialize zBuffers
+    emptyBuffer.assign(displayX*displayY,-1);
+    zBuffer = emptyBuffer;
+
 	movementSpeed = 5.0f;
 	cameraX = 0.0f;
 	cameraY = 0.0f;
@@ -25,7 +31,6 @@ void World::handleInput(SDL_Event const &event){
 			cameraYaw = cameraYaw-dY;
 			cameraPitch = cameraPitch-dP;
             handleRotation(dY,dP, 0);
-			std::cout << cameraYaw << "\n";
 		case SDL_KEYDOWN:
 			Uint8 const *keys = SDL_GetKeyboardState(nullptr);
 			if(keys[SDL_SCANCODE_W] == 1){
@@ -57,7 +62,7 @@ void World::handleRotation(float dYaw, float dPitch, float dRoll){
 
 }
 
-std::tuple<float , float > World::renderPointRelative(float  ix,float  iy,float  iz)
+std::tuple<int, int> World::renderPointRelative(float  ix,float  iy,float  iz)
 {
 	// Given Coorinates are relative to camera
 	// Fix this later (vertex is behind camera it is ignored)
@@ -71,9 +76,114 @@ std::tuple<float , float > World::renderPointRelative(float  ix,float  iy,float 
 	} else {
 		return std::make_tuple(-1, -1);
 	}
-} 
+}
 
-void World::renderTriPolygon(int x1, int y1, int z1,
+void World::renderTriPolygon(float x1, float y1, float z1,
+	    float x2, float y2, float z2,
+		float x3, float y3, float z3, float color[4])
+{
+	
+    // Set color to the given
+    SDL_SetRenderDrawColor(renderer,color[0],color[1],color[2],color[3]); 
+
+	// Given Coordinates are relative to camera
+	// z axis is horizontal to forward direction (when viewed from above)
+
+    // Make sure object is infront of camera
+    if (z1>0 && z2>0 && z3>0) { 
+
+        screenX1 = x1/z1;
+        screenX2 = x2/z2;
+        screenX3 = x3/z3;
+        screenY1 = y1/z1;
+        screenY2 = y2/z2;
+        screenY3 = y3/z3;
+    
+        // Find bounding box of triangle(winin the display window)
+        smallestX=std::min(screenX1,screenX2);
+        smallestX=std::min(smallestX,screenX3);
+        smallestX=std::max(0,smallestX);
+        smallestY=std::min(screenY1,screenY2);
+        smallestY=std::min(smallestY,screenY3);
+        smallestY=std::max(0,smallestY);
+
+        greatestX=std::max(screenX1,screenX2);
+        greatestX=std::max(smallestX,screenX3);
+        greatestX=std::min(disX,greatestX);
+        greatestY=std::max(screenY1,screenY2);
+        greatestY=std::max(smallestY,screenY3);
+        greatestY=std::min(disY,greatestY);
+
+
+        // Draw every pixel ( zBuffer[(i*disX)+j] is the current pixel on the buffer ) ( bigger z is further away from camera )
+        //      1 see if there exists a z point of the triangle that is less than than current buffer
+        //          2 if so calculate pixels z and see if that is less than current z buffer
+        //              3 if so, see if the pixel is actually within the triangle
+        //                  4 if so, draw the pixel and add its z value to the buffer
+        for(int i = smallestY; i<=greatestY; i++){
+            for(int j = smallestX; j<=greatestX; j++){
+                currZ = zBuffer[(i*disX)+j];
+                // 1
+                if((z1<currZ || z2<currZ || z3<currZ)||currZ==-1){
+                    // 2
+                    /*
+                    delX = (j-screenX1)*z1      because screenX1 = x1/z1 (surface is linear)
+                    delY = (i-screenY1)*z1
+                    a = <x2-x1,y2-y1,z2-z1>
+                    b = <x3-x1,y3-y1,z3-z1>
+                    pixZ = z1 + (-((((y2-y1)(z3-z1)-(z2-z1)(y3-y1))*((j-screenX1)*z1))+(((z2-z1)(x3-x1)-(x2-x1)(z3-z1))*((i-screenY1))*z1))/((x2-x1)(y3-y1)-(y2-y1)(x3-x1)));
+                    */
+
+                    zCalcDenominator = ((x2-x1)(y3-y1)-(y2-y1)(x3-x1)); 
+                    // Check for divide by zero
+                    if(zCalcDenominator==0){
+                        break;
+                    }
+                    pixZ = z1 + (-((((y2-y1)(z3-z1)-(z2-z1)(y3-y1))*((j-screenX1)*z1))+(((z2-z1)(x3-x1)-(x2-x1)(z3-z1))*((i-screenY1))*z1))/(zCalcDenominator));
+
+                    // 3
+                    if(pixZ < currZ){
+                        // See if pixel is inside triangle
+                        /* Functions of Lines:
+                         * y12 = (((y1-y2)/(x1-x2))(k-x1))+y1
+                         * y13 = (((y1-y3)/(x1-x3))(k-x1))+y1
+                         * y23 = (((y2-y3)/(x2-x3))(k-x2))+y2
+                        */
+                        crossCount = 0;
+                        for (int k = j; k<=greatestX; k++){
+                            // See if our current y (i) lays on one of the triangles borders at x = k
+                            if(i = (((y1-y2)/(x1-x2))(k-x1))+y1 || i = (((y1-y3)/(x1-x3))(k-x1))+y1 || i = (((y2-y3)/(x2-x3))(k-x2))+y2) {
+                                // Increase cross counter
+                                crossCounter++;
+                            }
+                        }
+                        // 4
+                        if (crossCount = 1){
+                            // Draw pixel
+                            SDL_RenderDrawPoint(renderer, j,i);
+
+                        }
+                        
+                    }
+                }
+            }
+        }
+
+
+        // p1 to p2
+        SDL_RenderDrawLine();
+
+        // p2 to p3
+        SDL_RenderDrawLine();
+
+        // p3 to p1
+        SDL_RenderDrawLine();
+
+    }
+	
+}
+
+void World::renderEdgeTriPolygon(int x1, int y1, int z1,
 		int x2, int y2, int z2,
 		int x3, int y3, int z3)
 {
@@ -103,7 +213,7 @@ void World::renderObject(Object object)
         if(surface->vertices[2]>0.0f && surface->vertices[5]>0.0f && surface->vertices[8]>0.0f){
             World::renderTriPolygon(surface->vertices[0], surface->vertices[1], surface->vertices[2],
                             surface->vertices[3], surface->vertices[4], surface->vertices[5],
-                            surface->vertices[6], surface->vertices[7], surface->vertices[8]);
+                            surface->vertices[6], surface->vertices[7], surface->vertices[8], surface->color);
         }
     }
 }
@@ -115,6 +225,7 @@ void World::addObject(Object object)
 
 void World::renderWorld()
 {
+    zBuffer=emptyBuffer;
     for(auto obj = objects.begin(); obj != objects.end(); obj++) {
         renderObject(*obj);
     }
