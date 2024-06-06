@@ -150,7 +150,7 @@ std::vector<Surface> Object::getMesh()
     
 }
 
-Surface::Surface(std::array<float,9> inVerticies, float inColor[4])
+Surface::Surface(std::array<float,9> inVerticies, std::array<float,4> inColor)
 {
     // color in form r, g, b, alpha
     // verties in form x1,y1,z1,x2,y2,z3,x3,y3,z3

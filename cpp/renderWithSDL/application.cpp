@@ -39,8 +39,16 @@ Application::Application()
 
     cube = new Object(mesh, 0, 0, 100, 0, 0, 0);
 
-    newCamera->addObject(*cube);
+    Surface s7({20.0f, 18.0f, -20.0f, -20.0f, 20.0f, -20.0f, -15.0f, -20.0f, -20.0f},{255, 255, 0, 255}); 
 
+    std::vector<Surface> mesh2({s7});
+
+    triangle = new Object(mesh2, 0,0,100, 0, 0, 0);
+
+    newCamera->addObject(*triangle);
+
+
+    draw();
 }
 
 Application::~Application()
@@ -70,8 +78,8 @@ void Application::loop()
 			}
 		}
 		// Should run at 240 fps?
-		update(1000.0/240.0);
-		draw();
+		update(1000.0/60.0);
+		//draw();
 	}
 }
 

@@ -25,4 +25,6 @@ private:
 
     Object   *cube;
 
+    Object  *triangle;
+
 };
