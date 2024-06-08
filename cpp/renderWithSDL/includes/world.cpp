@@ -160,9 +160,45 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         //                  4 if so, draw the pixel and add its z value to the buffer
         
         for(int i = smallestY; i<=greatestY; i++){
+
+            // Calculate the x position on every line at a given y
+            
+            triangleEdgeLeft=disX+1;
+            triangleEdgeRight=-1;
+            xPos = 0;
+            // Edge 1 to 2
+            if(((screenY1 <= i)&&(screenY2 >= i))||((screenY2 <= i)&&(screenY1 >= i))){
+                // Edge does cross this y
+                xPos = ((float)(i-screenY1)*(1.0f/slope1))+screenX1;
+                //std::cout <<"xPos: "<<xPos<<"\n";
+                triangleEdgeLeft = std::min(triangleEdgeLeft,xPos);
+                //std::cout <<"triangleLeft: "<<triangleEdgeLeft<<"\n";
+                triangleEdgeRight = std::max(triangleEdgeRight,xPos);
+            }
+            
+            // Edge 2 to 3
+            if(((screenY2 <= i)&&(screenY3 >= i))||((screenY3 <= i)&&(screenY2 >= i))){
+                // Edge does cross this y
+                xPos = ((float)(i-screenY2)*(1.0f/slope2))+screenX2;
+                triangleEdgeLeft = std::min(triangleEdgeLeft,xPos);
+                triangleEdgeRight = std::max(triangleEdgeRight,xPos); 
+            }
+
+            // Edge 3 to 1
+            if(((screenY3 <= i)&&(screenY1 >= i))||((screenY1 <= i)&&(screenY3 >= i))){
+                // Edge does cross this y 
+                xPos = ((float)(i-screenY3)*(1.0f/slope3))+screenX3;
+                triangleEdgeLeft = std::min(triangleEdgeLeft,xPos);
+                triangleEdgeRight = std::max(triangleEdgeRight,xPos);
+            }
+           
+            std::cout << "left: "<<triangleEdgeLeft<<", right: "<<triangleEdgeRight<<"\n";
+
+            /*  This is very slow we should not have to search for the edge we can calculate it 
+            
+            lastRead=0;
             triangleEdgeLeft=-1;
             triangleEdgeRight=-1;
-            lastRead=0;
             for (int k = smallestX; k<=greatestX; k++){
                 // See if our current y (i) lays on one of the triangles borders at x = k
                 if((((i < ((slope1)*(float)(k+1-screenX1))+screenY1) && (i > ((slope1)*(float)(k-1-screenX1))+screenY1)) || ((i > ((slope1)*(float)(k+1-screenX1))+screenY1) && (i < ((slope1)*(float)(k-1-screenX1))+screenY1))) && lastRead != 1){
@@ -204,7 +240,7 @@ void World::renderTriPolygon(float x1, float y1, float z1,
                     }
                 }
                 
-            }
+            } */
             
             for(int j = triangleEdgeLeft; j<=triangleEdgeRight; j++){
                 //currZ = zBuffer[((i-1)*disX)+j];

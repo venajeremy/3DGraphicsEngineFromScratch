@@ -62,6 +62,8 @@ private:
     float slope2;
     float slope3;
 
+    int xPos;
+
     int lastRead;
 
     float zCalcDenominator;

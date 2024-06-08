@@ -45,10 +45,10 @@ Application::Application()
 
     triangle = new Object(mesh2, 0,0,100, 0, 0, 0);
 
-    newCamera->addObject(*cube);
+    newCamera->addObject(*triangle);
 
 
-    //draw();
+    draw();
 }
 
 Application::~Application()
