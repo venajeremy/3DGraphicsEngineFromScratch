@@ -40,21 +40,20 @@ private:
     std::vector<float> zBuffer;
     std::vector<float> emptyBuffer;
 
-    float smallestX;
-    float smallestY;
-    float greatestX;
-    float greatestY;
+    int smallestX;
+    int smallestY;
+    int greatestX;
+    int greatestY;
 
-    float screenX1;
-    float screenX2;
-    float screenX3;
-    float screenY1;
-    float screenY2;
-    float screenY3;
+    int screenX1;
+    int screenX2;
+    int screenX3;
+    int screenY1;
+    int screenY2;
+    int screenY3;
 
-    int topLeftPixScreenX;
-    int topLeftPixScreenY;
-    int topLeftPixPerspZ;
+    int triangleEdgeLeft;
+    int triangleEdgeRight;
 
     float currZ;
     float pixZ;
@@ -63,7 +62,7 @@ private:
     float slope2;
     float slope3;
 
-    int crossCount;
+    int lastRead;
 
     float zCalcDenominator;
 

@@ -112,57 +112,104 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         // Find bounding box of triangle(winin the display window)
         smallestX=std::min(screenX1,screenX2);
         smallestX=std::min(smallestX,screenX3);
-        smallestX=std::max(0.0f,smallestX);
+        smallestX=std::max(0,smallestX);
         smallestY=std::min(screenY1,screenY2);
         smallestY=std::min(smallestY,screenY3);
-        smallestY=std::max(0.0f,smallestY);
+        smallestY=std::max(0,smallestY);
 
         greatestX=std::max(screenX1,screenX2);
         greatestX=std::max(greatestX,screenX3);
-        greatestX=std::min((float)disX,greatestX);
+        greatestX=std::min(disX,greatestX);
         greatestY=std::max(screenY1,screenY2);
         greatestY=std::max(greatestY,screenY3);
-        greatestY=std::min((float)disY,greatestY);
+        greatestY=std::min(disY,greatestY);
+        
+        //SDL_RenderDrawLine(renderer, smallestX, smallestY, smallestX, greatestY);
 
-        SDL_SetRenderDrawColor(renderer,0,255,0,255);
+        //SDL_RenderDrawLine(renderer, smallestX, greatestY, greatestX, greatestY);
 
-        SDL_RenderDrawLine(renderer, smallestX, smallestY, smallestX, greatestY);
-        SDL_RenderDrawLine(renderer, smallestX, greatestY, greatestX, greatestY);
-        SDL_RenderDrawLine(renderer, greatestX, greatestY, greatestX, smallestY);
-        SDL_RenderDrawLine(renderer, greatestX, smallestY, smallestX, smallestY);
+        //SDL_RenderDrawLine(renderer, greatestX, greatestY, greatestX, smallestY);
+
+        //SDL_RenderDrawLine(renderer, greatestX, smallestY, smallestX, smallestY);
 
         //Slope 1:
         if (screenX1-screenX2 == 0){
             slope1 = 9999;
         } else {
-            slope1 = ((screenY1-screenY2)/(screenX1-screenX2));
+            slope1 = ((float)(screenY1-screenY2)/(float)(screenX1-screenX2));
         }
 
         //Slope 2:
         if (screenX2-screenX3 == 0){
             slope2 = 9999;
         } else {
-            slope2 = ((screenY2-screenY3)/(screenX2-screenX3));
+            slope2 = ((float)(screenY2-screenY3)/(float)(screenX2-screenX3));
         }
 
         //Slope 3:
         if (screenX3-screenX1 == 0){
             slope3 = 9999;
         } else {
-            slope3 = ((screenY3-screenY1)/(screenX3-screenX1));
+            slope3 = ((float)(screenY3-screenY1)/(float)(screenX3-screenX1));
         }
-         
+
         // Draw every pixel ( zBuffer[((i-1)*disX)+j] is the current pixel on the buffer ) ( bigger z is further away from camera )
-        //      1 see if there exists a z point of the triangle that is less than than current buffer
-        //          2 if so calculate pixels z and see if that is less than current z buffer
-        //              3 if so, see if the pixel is actually within the triangle
+        //      1 find every pixel that is inside the traingle
+        //          2 if there exists a z point of the triangle that is less than than current buffer 
+        //              3 calculate pixels z and see if that is less than current z buffer
         //                  4 if so, draw the pixel and add its z value to the buffer
         
         for(int i = smallestY; i<=greatestY; i++){
-            for(int j = smallestX; j<=greatestX; j++){
-                currZ = zBuffer[((i-1)*disX)+j];
-                // 1
-                if(z1<currZ || z2<currZ || z3<currZ ||currZ==-1){
+            triangleEdgeLeft=-1;
+            triangleEdgeRight=-1;
+            lastRead=0;
+            for (int k = smallestX; k<=greatestX; k++){
+                // See if our current y (i) lays on one of the triangles borders at x = k
+                if((((i < ((slope1)*(float)(k+1-screenX1))+screenY1) && (i > ((slope1)*(float)(k-1-screenX1))+screenY1)) || ((i > ((slope1)*(float)(k+1-screenX1))+screenY1) && (i < ((slope1)*(float)(k-1-screenX1))+screenY1))) && lastRead != 1){
+                    
+                    if(triangleEdgeLeft==-1){
+                        triangleEdgeLeft=k;
+                        lastRead=1;
+                    } else if (triangleEdgeRight==-1){
+                        triangleEdgeRight=k;
+                        lastRead=1;
+                    } else {
+                        break;
+                    }
+                }
+                    //i == (int)((slope2)*(float)(k-screenX2))+screenY2
+                if((((i < ((slope2)*(float)(k+1-screenX2))+screenY2) && (i > ((slope2)*(float)(k-1-screenX2))+screenY2)) || ((i > ((slope2)*(float)(k+1-screenX2))+screenY2) && (i < ((slope2)*(float)(k-1-screenX2))+screenY2))) && lastRead != 2){
+                    
+                    if(triangleEdgeLeft==-1){
+                        triangleEdgeLeft=k;
+                        lastRead=2;
+                    } else if (triangleEdgeRight==-1){
+                        triangleEdgeRight=k;
+                        lastRead=2;
+                    } else {
+                        break;
+                    }
+                }
+
+                if((((i < ((slope3)*(float)(k+1-screenX3))+screenY3) && (i > ((slope3)*(float)(k-1-screenX3))+screenY3)) || ((i > ((slope3)*(float)(k+1-screenX3))+screenY3) && (i < ((slope3)*(float)(k-1-screenX3))+screenY3))) && lastRead != 3){
+                    
+                    if(triangleEdgeLeft==-1){
+                        triangleEdgeLeft=k;
+                        lastRead=3;
+                    } else if (triangleEdgeRight==-1){
+                        triangleEdgeRight=k;
+                        lastRead=3;
+                    } else {
+                        break;
+                    }
+                }
+                
+            }
+            
+            for(int j = triangleEdgeLeft; j<=triangleEdgeRight; j++){
+                //currZ = zBuffer[((i-1)*disX)+j];
+                // 1 z1<currZ || z2<currZ || z3<currZ ||currZ==-1
+                if(true){
                     // 2
                     
                     //delX = (j-screenX1)*z1      because screenX1 = x1/z1 (surface is linear)
@@ -181,41 +228,10 @@ void World::renderTriPolygon(float x1, float y1, float z1,
 
                     // 3 pixZ < currZ
                     if(true){
-                        // Rasterize:
-                        // See if pixel is inside triangle
-                        // Functions of Lines:
-                        // y12 = (((y1-y2)/(x1-x2))(k-x1))+y1
-                        // y13 = (((y1-y3)/(x1-x3))(k-x1))+y1
-                        // y23 = (((y2-y3)/(x2-x3))(k-x2))+y2
-                         
-                        crossCount = 0;
-                        for (int k = j; k<=greatestX; k++){
-                            // See if our current y (i) lays on one of the triangles borders at x = k
-                            if(i == ((slope1)*(float)(k-screenX1))+screenY1){
-                                std::cout << "Starting x="<<j<<", y="<<i<< "   Found line with slope: " << slope1 << "  screenY1= "<<screenY1<<", screenY2= "<<screenY2<<", screenX1= "<<screenX1<<", screenX2= "<<screenX2<<", count="<<crossCount+1<<"\n";
-                                crossCount++;
-                            }
 
-                            if(i == ((slope2)*(float)(k-screenX2))+screenY2){
-                                std::cout <<  "Starting x="<<j<<", y="<<i<< "       Found line with slope: " << slope2 << "  screenY2= "<<screenY2<<", screenY3= "<<screenY3<<", screenX2= "<<screenX2<<", screenX3= "<<screenX3<<", count="<<crossCount+1<<"\n";
+                    
+                        SDL_RenderDrawPoint(renderer, j,i);
 
-                                crossCount++;
-                            }
-
-                            if(i == ((slope3)*(float)(k-screenX3))+screenY3){
-                                std::cout <<  "Starting x="<<j<<", y="<<i<< "       Found line with slope: " << slope3 << "  screenY3= "<<screenY3<<", screenY1= "<<screenY1<<", screenX3= "<<screenX3<<", screenX1= "<<screenX1<<", count="<<crossCount+1<<"\n";
-                                crossCount++;
-                            }
-                            if (crossCount == 2){
-                               break; 
-                            }
-                        }
-                        // 4
-                        if (crossCount == 1){
-                            // Draw pixel
-                            SDL_RenderDrawPoint(renderer, j,i);
-
-                        }
                         
                     }
                 }
