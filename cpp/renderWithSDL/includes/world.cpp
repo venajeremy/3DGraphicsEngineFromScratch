@@ -123,34 +123,26 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         greatestY=std::max(screenY1,screenY2);
         greatestY=std::max(greatestY,screenY3);
         greatestY=std::min(disY,greatestY);
-        
-        //SDL_RenderDrawLine(renderer, smallestX, smallestY, smallestX, greatestY);
-
-        //SDL_RenderDrawLine(renderer, smallestX, greatestY, greatestX, greatestY);
-
-        //SDL_RenderDrawLine(renderer, greatestX, greatestY, greatestX, smallestY);
-
-        //SDL_RenderDrawLine(renderer, greatestX, smallestY, smallestX, smallestY);
 
         //Slope 1:
-        if (screenX1-screenX2 == 0){
+        if (screenY1-screenY2 == 0){
             slope1 = 9999;
         } else {
-            slope1 = ((float)(screenY1-screenY2)/(float)(screenX1-screenX2));
+            slope1 = ((float)(screenX1-screenX2)/(float)(screenY1-screenY2));
         }
 
         //Slope 2:
-        if (screenX2-screenX3 == 0){
+        if (screenY2-screenY3 == 0){
             slope2 = 9999;
         } else {
-            slope2 = ((float)(screenY2-screenY3)/(float)(screenX2-screenX3));
+            slope2 = ((float)(screenX2-screenX3)/(float)(screenY2-screenY3));
         }
 
         //Slope 3:
-        if (screenX3-screenX1 == 0){
+        if (screenY3-screenY1 == 0){
             slope3 = 9999;
         } else {
-            slope3 = ((float)(screenY3-screenY1)/(float)(screenX3-screenX1));
+            slope3 = ((float)(screenX3-screenX1)/(float)(screenY3-screenY1));
         }
 
         // Draw every pixel ( zBuffer[((i-1)*disX)+j] is the current pixel on the buffer ) ( bigger z is further away from camera )
@@ -169,17 +161,15 @@ void World::renderTriPolygon(float x1, float y1, float z1,
             // Edge 1 to 2
             if(((screenY1 <= i)&&(screenY2 >= i))||((screenY2 <= i)&&(screenY1 >= i))){
                 // Edge does cross this y
-                xPos = ((float)(i-screenY1)*(1.0f/slope1))+screenX1;
-                //std::cout <<"xPos: "<<xPos<<"\n";
+                xPos = (int)((float)(i-screenY1)*(slope1))+screenX1;
                 triangleEdgeLeft = std::min(triangleEdgeLeft,xPos);
-                //std::cout <<"triangleLeft: "<<triangleEdgeLeft<<"\n";
                 triangleEdgeRight = std::max(triangleEdgeRight,xPos);
             }
             
             // Edge 2 to 3
             if(((screenY2 <= i)&&(screenY3 >= i))||((screenY3 <= i)&&(screenY2 >= i))){
                 // Edge does cross this y
-                xPos = ((float)(i-screenY2)*(1.0f/slope2))+screenX2;
+                xPos = (int)((float)(i-screenY2)*(slope2))+screenX2;
                 triangleEdgeLeft = std::min(triangleEdgeLeft,xPos);
                 triangleEdgeRight = std::max(triangleEdgeRight,xPos); 
             }
@@ -187,12 +177,10 @@ void World::renderTriPolygon(float x1, float y1, float z1,
             // Edge 3 to 1
             if(((screenY3 <= i)&&(screenY1 >= i))||((screenY1 <= i)&&(screenY3 >= i))){
                 // Edge does cross this y 
-                xPos = ((float)(i-screenY3)*(1.0f/slope3))+screenX3;
+                xPos = (int)((float)(i-screenY3)*(slope3))+screenX3;
                 triangleEdgeLeft = std::min(triangleEdgeLeft,xPos);
                 triangleEdgeRight = std::max(triangleEdgeRight,xPos);
             }
-           
-            std::cout << "left: "<<triangleEdgeLeft<<", right: "<<triangleEdgeRight<<"\n";
 
             /*  This is very slow we should not have to search for the edge we can calculate it 
             
@@ -241,7 +229,7 @@ void World::renderTriPolygon(float x1, float y1, float z1,
                 }
                 
             } */
-            
+             
             for(int j = triangleEdgeLeft; j<=triangleEdgeRight; j++){
                 //currZ = zBuffer[((i-1)*disX)+j];
                 // 1 z1<currZ || z2<currZ || z3<currZ ||currZ==-1
