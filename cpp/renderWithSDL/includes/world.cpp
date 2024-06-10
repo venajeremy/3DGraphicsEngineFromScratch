@@ -41,7 +41,14 @@ void World::handleInput(SDL_Event const &event){
 				handleMovement(-movementSpeed, 0, 0);
             }else if(keys[SDL_SCANCODE_D] == 1){
 				handleMovement(movementSpeed, 0, 0);
+            }else if(keys[SDL_SCANCODE_G] == 1){
+				objects.begin()->objectRotate(0.05f, 0, 0);
+            }else if(keys[SDL_SCANCODE_H] == 1){
+				objects.begin()->objectRotate(-0.05f, 0, 0);
+
             }
+
+
             break;
 
 	}
@@ -100,24 +107,18 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         SDL_SetRenderDrawColor(renderer,color.at(0),color.at(1),color.at(2),color.at(3));
     
         // Find bounding box of triangle(winin the display window)
-        smallestX=std::min(screenX1,screenX2);
-        smallestX=std::min(smallestX,screenX3);
-        smallestX=std::max(0,smallestX);
         smallestY=std::min(screenY1,screenY2);
         smallestY=std::min(smallestY,screenY3);
-        smallestY=std::max(0,smallestY);
+        smallestY=std::max(1,smallestY);
 
-        greatestX=std::max(screenX1,screenX2);
-        greatestX=std::max(greatestX,screenX3);
-        greatestX=std::min(disX,greatestX);
         greatestY=std::max(screenY1,screenY2);
         greatestY=std::max(greatestY,screenY3);
         greatestY=std::min(disY,greatestY);
 
         // Make sure one point of the polygon is within the display
-        if(((screenX1<disX)&&(screenX1>0)&&(screenY1<disY)&&(screenY1))||
-                ((screenX2<disX)&&(screenX2>0)&&(screenY2<disY)&&(screenY2))||
-                ((screenX1<disX)&&(screenX1>0)&&(screenY1<disY)&&(screenY1))){
+        if(((screenX1<disX)&&(screenX1>0)&&(screenY1<disY)&&(screenY1>0))||
+                ((screenX2<disX)&&(screenX2>0)&&(screenY2<disY)&&(screenY2>0))||
+                ((screenX3<disX)&&(screenX3>0)&&(screenY3<disY)&&(screenY3>0))){
             //Slope 1:
             if (screenY1-screenY2 == 0){
                 slope1 = 9999;
@@ -177,19 +178,20 @@ void World::renderTriPolygon(float x1, float y1, float z1,
                 }
 
                 // Ensure left and right are inside of display
-                triangleEdgeLeft = std::max(0,triangleEdgeLeft);
+                triangleEdgeLeft = std::max(1,triangleEdgeLeft);
                 triangleEdgeLeft = std::min(disX,triangleEdgeLeft);
-                triangleEdgeRight = std::max(0,triangleEdgeRight);
+                triangleEdgeRight = std::max(1,triangleEdgeRight);
                 triangleEdgeRight = std::min(disX,triangleEdgeRight);
                  
                 for(int j = triangleEdgeLeft; j<=triangleEdgeRight; j++){
                     // 2
-                    currZ = zBuffer[((i-1)*disX)+j]; 
+
+                    currZ = zBuffer[(((i-1)*disX)+j)-1];
                     if(z1<currZ || z2<currZ || z3<currZ ||currZ==-1){
                         // 3
                         
-                        //a = <x2-x1,y2-y1,z2-z1>
-                        //b = <x3-x1,y3-y1,z3-z1>
+                        // Uses formula for plane between three points.  Uses 2d x and y with 3d z pos.  ( this might be a problem, though i hope not )
+
                         //pixZ = z1 + (-((((screenY2-screenY1)*(z3-z1)-(z2-z1)*(screenY3-screenY1))*(j-screenX1))+(((z2-z1)*(screenX3-screenX1)-(screenX2-screenX1)*(z3-z1))*(i-screenY1)))/((screenX2-screenX1)*(screenY3-screenY1)-(screenY2-screenY1)*(screenX3-screenX1)));
 
                         zCalcDenominator = ((screenX2-screenX1)*(screenY3-screenY1)-(screenY2-screenY1)*(screenX3-screenX1)); 
@@ -202,8 +204,8 @@ void World::renderTriPolygon(float x1, float y1, float z1,
 
                         // 4 pixZ < currZ
                         if((pixZ < currZ)||(currZ==-1)){
-
-                            zBuffer[((i-1)*disX)+j] = pixZ;
+                            
+                            zBuffer[(((i-1)*disX)+j)-1] = pixZ;
                             SDL_RenderDrawPoint(renderer, j,i);
 
                             
