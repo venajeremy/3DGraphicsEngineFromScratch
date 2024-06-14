@@ -11,13 +11,13 @@ World::World(SDL_Renderer *inputRenderer, float inputCameraFov, int displayX, in
     emptyBuffer.assign(displayX*displayY,-1);
     zBuffer = emptyBuffer;
 
-	movementSpeed = 5.0f;
+	movementSpeed = 2.0f;
 	cameraX = 0.0f;
 	cameraY = 0.0f;
 	cameraZ = 0.0f;
 	cameraYaw = 0.0f;
 	cameraPitch = 0.0f;
-	sensitivity = 0.005f;
+	sensitivity = 0.001f;
 	// Make Mouse Movement Relative
 	SDL_SetRelativeMouseMode(SDL_TRUE);
 }
@@ -75,9 +75,9 @@ std::tuple<int, int> World::renderPointRelative(float  ix,float  iy,float  iz)
 	// Fix this later (vertex is behind camera it is ignored)
 	if(iz>0)
 	{
-		float xAngle = (ix)/(iz);
+		float xAngle = atan((ix)/(iz));
 		
-		float yAngle = (-iy)/(iz);
+		float yAngle = atan((-iy)/(iz));
 
 		return std::make_tuple(disX*(((cameraFov/2)+xAngle)/cameraFov),disY*(((cameraFov/2)+yAngle)/cameraFov));
 	} else {
@@ -193,22 +193,29 @@ void World::renderTriPolygon(float x1, float y1, float z1,
                         // Uses formula for plane between three points.  Uses 2d x and y with 3d z pos.  ( this might be a problem, though i hope not )
 
                         //pixZ = z1 + (-((((screenY2-screenY1)*(z3-z1)-(z2-z1)*(screenY3-screenY1))*(j-screenX1))+(((z2-z1)*(screenX3-screenX1)-(screenX2-screenX1)*(z3-z1))*(i-screenY1)))/((screenX2-screenX1)*(screenY3-screenY1)-(screenY2-screenY1)*(screenX3-screenX1)));
-
-                        zCalcDenominator = ((screenX2-screenX1)*(screenY3-screenY1)-(screenY2-screenY1)*(screenX3-screenX1)); 
-                        // Check for divide by zero
-                        if(zCalcDenominator==0){
-                            break;
-                        }
-                        // Calculate the z of current pixel
-                        pixZ = z1 + (-((((screenY2-screenY1)*(z3-z1)-(z2-z1)*(screenY3-screenY1))*(j-screenX1))+(((z2-z1)*(screenX3-screenX1)-(screenX2-screenX1)*(z3-z1))*(i-screenY1)))/(zCalcDenominator));
-
-                        // 4 pixZ < currZ
-                        if((pixZ < currZ)||(currZ==-1)){
-                            
-                            zBuffer[(((i-1)*disX)+j)-1] = pixZ;
+                
+                        // Estimate of z buffer rendering doesn't support crossing polygon rendering
+                        if((z1<currZ && z2<currZ && z3<currZ) || currZ==-1){
+                            zBuffer[(((i-1)*disX)+j)-1] = (z1+z2+z3)/3;
                             SDL_RenderDrawPoint(renderer, j,i);
+                        } else {
 
-                            
+                            zCalcDenominator = ((screenX2-screenX1)*(screenY3-screenY1)-(screenY2-screenY1)*(screenX3-screenX1)); 
+                            // Check for divide by zero
+                            if(zCalcDenominator==0){
+                                break;
+                            }
+                            // Calculate the z of current pixel
+                            pixZ = z1 + (-((((screenY2-screenY1)*(z3-z1)-(z2-z1)*(screenY3-screenY1))*(j-screenX1))+(((z2-z1)*(screenX3-screenX1)-(screenX2-screenX1)*(z3-z1))*(i-screenY1)))/(zCalcDenominator));
+
+                            // 4 pixZ < currZ
+                            if((pixZ < currZ)||(currZ==-1)){
+                                
+                                zBuffer[(((i-1)*disX)+j)-1] = pixZ;
+                                SDL_RenderDrawPoint(renderer, j,i);
+
+                                
+                            }
                         }
                     }
                 }

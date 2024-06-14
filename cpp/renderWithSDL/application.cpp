@@ -43,15 +43,22 @@ Application::Application()
 
     std::vector<Surface> mesh({s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12});
 
-    cube = new Object(mesh, 0, 30, 100, 0, 0, 0);
-
-    Surface triangleSurface({15.0f, -10.0f, -20.0f, 20.0f, 20.0f, -20.0f, -15.0f, -20.0f, -20.0f},{255, 255, 0, 255}); 
+    cube = new Object(mesh, 0, 0, 100, 0, 0, 0);
+    
+    Surface triangleSurface({30.0f, 25.0f, -20.0f, 25.0f, -20.0f, -20.0f, -30.0f, -20.0f, 30.0f},{100, 100, 0, 255}); 
 
     std::vector<Surface> mesh2({triangleSurface});
 
     triangle = new Object(mesh2, 0,0,100, 0, 0, 0);
 
     newCamera->addObject(*cube);
+    
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 10; j++){
+            Object *newCube = new Object(mesh,i*45,j*45,100,0,0,0);
+            newCamera->addObject(*newCube);
+        }
+    }
 
 
     draw();
