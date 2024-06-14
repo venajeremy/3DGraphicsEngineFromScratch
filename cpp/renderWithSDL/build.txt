@@ -1,0 +1,2 @@
+g++ *.cpp includes/world.cpp includes/object.cpp $(sdl2-config --cflags --libs)
+
