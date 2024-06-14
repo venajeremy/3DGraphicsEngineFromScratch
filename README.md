@@ -1,0 +1,1 @@
+This is a 3d engine built from scratch using SDL2 to create windows take user input and draw individual pixels to the screen.  The purpose of this project was to learn the core concepts of 3d graphics rendering and potentially isolate points of optimization for current rendering methods.
