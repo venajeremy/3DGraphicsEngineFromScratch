@@ -53,8 +53,8 @@ Application::Application()
 
     newCamera->addObject(*cube);
     
-    for(int i = 0; i < 10; i++){
-        for(int j = 0; j < 10; j++){
+    for(int i = 0; i < 1; i++){
+        for(int j = 0; j < 1; j++){
             Object *newCube = new Object(mesh,i*45,j*45,100,0,0,0);
             newCamera->addObject(*newCube);
         }
@@ -91,7 +91,7 @@ void Application::loop()
 			}
 		}
 		// Should run at 240 fps?
-		update(1000.0/60.0);
+		update(1000.0/240.0);
 		draw();
 	}
 }

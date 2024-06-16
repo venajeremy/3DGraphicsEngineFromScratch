@@ -27,7 +27,7 @@ void Object::worldTranslate(float dX, float dY, float dZ)
 
 void Object::worldRotate(float dYaw, float dPitch, float dRoll)
 {
-
+    // vertice array is in form x1, y1, z1, x2, y2, z2, x3, y3, z3,
     // Note: these rotations are relative to the camera
 
     if(dYaw!=0) {

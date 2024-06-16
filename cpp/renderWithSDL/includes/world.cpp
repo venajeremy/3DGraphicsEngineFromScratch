@@ -69,33 +69,37 @@ void World::handleRotation(float dYaw, float dPitch, float dRoll){
 
 }
 
-std::tuple<int, int> World::renderPointRelative(float  ix,float  iy,float  iz)
+std::tuple<int, int> World::renderPointRelative(float ix,float iy,float iz)
 {
 	// Given Coorinates are relative to camera
-	// Fix this later (vertex is behind camera it is ignored)
-	if(iz>0)
-	{
-		float xAngle = atan((ix)/(iz));
-		
-		float yAngle = atan((-iy)/(iz));
 
-		return std::make_tuple(disX*(((cameraFov/2)+xAngle)/cameraFov),disY*(((cameraFov/2)+yAngle)/cameraFov));
-	} else {
-		return std::make_tuple(-1, -1);
-	}
+	// z can never be zero
+	if(iz==0) {
+        iz = 0.0001f;
+    }
+	
+    float xAngle = atan((ix)/(iz));
+    
+    float yAngle = atan((-iy)/(iz));
+
+    return std::make_tuple(disX*(((cameraFov/2)+xAngle)/cameraFov),disY*(((cameraFov/2)+yAngle)/cameraFov));
+	
 }
 
 void World::renderTriPolygon(float x1, float y1, float z1,
 	    float x2, float y2, float z2,
 		float x3, float y3, float z3, std::array<float,4> color)
-{ 
+{
 
-	// Given Coordinates are relative to camera
-	// z axis is horizontal to forward direction (when viewed from above)
+    // This method takes 3 points in threespace maps them to 3 points in twospace on the window and fills the polygon depending on its visibility to the camera. A few things to take note of:
 
-    // Make sure object is infront of camera
-    if (z1>0 && z2>0 && z3>0) { 
+	// - Given Threespace Coordinates are relative to camera
+	// - Z axis is horizontal to forward direction (when viewed from above). We do not calculate the actual distance to the point.  This speeds rendering, but forces us to rotate our world around the camera.
 
+    // We only want to render if at least one vertex of the polygon is infront of the camera
+    if (z1>0 || z2>0 || z3>0) { 
+
+        // Use helper function to translate get twospace coordinates of vertexes relative to the camera
         screenX1 = std::get<0>(renderPointRelative(x1,y1,z1));
         screenX2 = std::get<0>(renderPointRelative(x2,y2,z2));
         screenX3 = std::get<0>(renderPointRelative(x3,y3,z3));
@@ -103,10 +107,10 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         screenY2 = std::get<1>(renderPointRelative(x2,y2,z2));
         screenY3 = std::get<1>(renderPointRelative(x3,y3,z3));
 
-        // Set color to given
+        // Set color to given ( in the future this will be replaced by some texture system )
         SDL_SetRenderDrawColor(renderer,color.at(0),color.at(1),color.at(2),color.at(3));
     
-        // Find bounding box of triangle(winin the display window)
+        // Find the min and max Y of our polygon within the window (bounding y)
         smallestY=std::min(screenY1,screenY2);
         smallestY=std::min(smallestY,screenY3);
         smallestY=std::max(1,smallestY);
@@ -115,10 +119,15 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         greatestY=std::max(greatestY,screenY3);
         greatestY=std::min(disY,greatestY);
 
-        // Make sure one point of the polygon is within the display
+        // Only render if one point is within the window
         if(((screenX1<disX)&&(screenX1>0)&&(screenY1<disY)&&(screenY1>0))||
                 ((screenX2<disX)&&(screenX2>0)&&(screenY2<disY)&&(screenY2>0))||
                 ((screenX3<disX)&&(screenX3>0)&&(screenY3<disY)&&(screenY3>0))){
+
+            // Find the slope of all sides of polygon (run/rise dont get confused!)
+            
+            // No such thing as perfectly horizontal ;)  (wont make a difference this is just for pixels on monitor, we would need a monitor with more than 9999 pixels horizontal to see a 1 pixel error)
+
             //Slope 1:
             if (screenY1-screenY2 == 0){
                 slope1 = 9999;
@@ -140,8 +149,21 @@ void World::renderTriPolygon(float x1, float y1, float z1,
                 slope3 = ((float)(screenX3-screenX1)/(float)(screenY3-screenY1));
             }
 
+            // Used in zbuffer calculation
+            zCalcDenominator = ((screenX2-screenX1)*(screenY3-screenY1)-(screenY2-screenY1)*(screenX3-screenX1)); 
+            // Check for divide by zero
+            if(zCalcDenominator==0){
+                zCalcDenominator==0.001;
+            }
+
+            // Used in zbuffer calculation
+            zDy = ((screenY2-screenY1)*(z3-z1)-(z2-z1)*(screenY3-screenY1));
+
+            zDx = ((z2-z1)*(screenX3-screenX1)-(screenX2-screenX1)*(z3-z1));
+
+
             // Draw every pixel ( zBuffer[(((i-1)*disX)+j)-1] is the current pixel on the buffer ) ( bigger z is further away from camera )
-            //      1 for every pixel that is inside the traingle
+            //      1 for every point within our triangle
             //          2 if there exists a z point of the triangle that is less than than current buffer
             //              3 calculate pixels z and see if that is less than current z buffer
             //                  4 if so, draw the pixel and add its z value to the buffer
@@ -150,9 +172,19 @@ void World::renderTriPolygon(float x1, float y1, float z1,
                 // 1
                 // Calculate the x position on every line at a given y
                 
-                triangleEdgeLeft=disX+1;
+                // Initilize the edges on left and right at y point
+                triangleEdgeLeft=disX+1; 
                 triangleEdgeRight=-1;
+
                 xPos = 0;
+
+                // 1, 2, and 3 are the points of the triangle
+                // We need to make sure our y point (i) is inside our edge:
+                //      Remember: our edges are interpreted lines and technically go on forever, we dont want to account for part of our line that is outside the bounds of our edge
+
+                // We then calculate the X position of this edge at our given Y(i) 
+                // We make it the new left or right edge accordingly
+
                 // Edge 1 to 2
                 if(((screenY1 <= i)&&(screenY2 >= i))||((screenY2 <= i)&&(screenY1 >= i))){
                     // Edge does cross this y
@@ -193,14 +225,12 @@ void World::renderTriPolygon(float x1, float y1, float z1,
                         // Uses formula for plane between three points.  Uses 2d x and y with 3d z pos of points.  ( this might be a problem, though i hope not )
 
                         //pixZ = z1 + (-((((screenY2-screenY1)*(z3-z1)-(z2-z1)*(screenY3-screenY1))*(j-screenX1))+(((z2-z1)*(screenX3-screenX1)-(screenX2-screenX1)*(z3-z1))*(i-screenY1)))/((screenX2-screenX1)*(screenY3-screenY1)-(screenY2-screenY1)*(screenX3-screenX1)));
+                
+                        // Portions of the above formula are calculated above as they do not need to be calculated differently for each pixel. i and j (our x and y) are the only variables changing per pixel
 
-                        zCalcDenominator = ((screenX2-screenX1)*(screenY3-screenY1)-(screenY2-screenY1)*(screenX3-screenX1)); 
-                        // Check for divide by zero
-                        if(zCalcDenominator==0){
-                            break;
-                        }
+                                                
                         // Calculate the z of current pixel
-                        pixZ = z1 + (-((((screenY2-screenY1)*(z3-z1)-(z2-z1)*(screenY3-screenY1))*(j-screenX1))+(((z2-z1)*(screenX3-screenX1)-(screenX2-screenX1)*(z3-z1))*(i-screenY1)))/(zCalcDenominator));
+                        pixZ = z1 + (-((zDy*(j-screenX1))+(zDx*(i-screenY1)))/(zCalcDenominator));
 
                         // 4 pixZ < currZ
                         if((pixZ < currZ)||(currZ==-1)){
@@ -223,6 +253,8 @@ void World::renderEdgeTriPolygon(float x1, float y1, float z1,
 		float x2, float y2, float z2,
 		float x3, float y3, float z3, std::array<float,4> color)
 {
+
+    // This method just draws simple borders of polygon
 	
 	// Given Coordinates are relative to camera
 	// z axis is horizontal to forward direction (when viewed from above)

@@ -67,6 +67,8 @@ private:
     int lastRead;
 
     float zCalcDenominator;
+    float zDy;
+    float zDx;
 
 	float cameraFov;
 	float cameraX;
