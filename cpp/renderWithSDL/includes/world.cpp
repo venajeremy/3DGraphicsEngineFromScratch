@@ -30,7 +30,8 @@ void World::handleInput(SDL_Event const &event){
             dP = event.motion.yrel*sensitivity;
 			cameraYaw = cameraYaw-dY;
 			cameraPitch = cameraPitch-dP;
-            handleRotation(dY,dP, 0);
+            handleRotation(dY,0,0);
+            handleRotation(0,dP,0);
 		case SDL_KEYDOWN:
 			Uint8 const *keys = SDL_GetKeyboardState(nullptr);
 			if(keys[SDL_SCANCODE_W] == 1){
@@ -162,6 +163,25 @@ void World::renderTriPolygon(float x1, float y1, float z1,
             zDx = ((z2-z1)*(screenX3-screenX1)-(screenX2-screenX1)*(z3-z1));
 
 
+            // Order the y points of triangle's verticies
+            top = middle = bottom = &screenY1;
+            if(screenY2<*top){
+                top = &screenY2;
+            } else if(screenY2>*bottom){
+                bottom = &screenY2;
+            } else {
+                middle = &screenY2;
+            }
+            if(screenY3<*top){
+                middle = top;
+                top = &screenY3;
+            }
+            if(screenY3>*bottom){
+                middle = bottom;
+                bottom = &screenY3;
+            }
+
+
             // Draw every pixel ( zBuffer[(((i-1)*disX)+j)-1] is the current pixel on the buffer ) ( bigger z is further away from camera )
             //      1 for every point within our triangle
             //          2 if there exists a z point of the triangle that is less than than current buffer
@@ -188,7 +208,7 @@ void World::renderTriPolygon(float x1, float y1, float z1,
                 // Edge 1 to 2
                 if(((screenY1 <= i)&&(screenY2 >= i))||((screenY2 <= i)&&(screenY1 >= i))){
                     // Edge does cross this y
-                    xPos = (int)((float)(i-screenY1)*(slope1))+screenX1;
+                    xPos = (int)((i-screenY1)*(slope1))+screenX1;
                     triangleEdgeLeft = std::min(triangleEdgeLeft,xPos);
                     triangleEdgeRight = std::max(triangleEdgeRight,xPos);
                 }
@@ -196,7 +216,7 @@ void World::renderTriPolygon(float x1, float y1, float z1,
                 // Edge 2 to 3
                 if(((screenY2 <= i)&&(screenY3 >= i))||((screenY3 <= i)&&(screenY2 >= i))){
                     // Edge does cross this y
-                    xPos = (int)((float)(i-screenY2)*(slope2))+screenX2;
+                    xPos = (int)((i-screenY2)*(slope2))+screenX2;
                     triangleEdgeLeft = std::min(triangleEdgeLeft,xPos);
                     triangleEdgeRight = std::max(triangleEdgeRight,xPos); 
                 }
@@ -204,7 +224,7 @@ void World::renderTriPolygon(float x1, float y1, float z1,
                 // Edge 3 to 1
                 if(((screenY3 <= i)&&(screenY1 >= i))||((screenY1 <= i)&&(screenY3 >= i))){
                     // Edge does cross this y 
-                    xPos = (int)((float)(i-screenY3)*(slope3))+screenX3;
+                    xPos = (int)((i-screenY3)*(slope3))+screenX3;
                     triangleEdgeLeft = std::min(triangleEdgeLeft,xPos);
                     triangleEdgeRight = std::max(triangleEdgeRight,xPos);
                 }

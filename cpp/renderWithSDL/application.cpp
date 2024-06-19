@@ -51,11 +51,11 @@ Application::Application()
 
     triangle = new Object(mesh2, 0,0,100, 0, 0, 0);
 
-    newCamera->addObject(*cube);
+    //newCamera->addObject(*cube);
     
-    for(int i = 0; i < 1; i++){
-        for(int j = 0; j < 1; j++){
-            Object *newCube = new Object(mesh,i*45,j*45,100,0,0,0);
+    for(int i = 0; i < 2; i++){
+        for(int j = 0; j < 2; j++){
+            Object *newCube = new Object(mesh,i*45,j*45,60,0,0,0);
             newCamera->addObject(*newCube);
         }
     }

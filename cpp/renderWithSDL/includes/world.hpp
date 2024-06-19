@@ -64,7 +64,9 @@ private:
 
     int xPos;
 
-    int lastRead;
+    int top;
+    int middle;
+    int bottom;
 
     float zCalcDenominator;
     float zDy;

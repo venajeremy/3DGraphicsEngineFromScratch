@@ -33,46 +33,74 @@ void Object::worldRotate(float dYaw, float dPitch, float dRoll)
     if(dYaw!=0) {
         for(auto surf = mesh.begin(); surf != mesh.end(); ++surf) {
             // Rotate every vertice around the origin
-            surf->vertices[0] = (surf->vertices[0]*cos(dYaw))-(surf->vertices[2]*sin(dYaw));
-            surf->vertices[2] = (surf->vertices[0]*sin(dYaw))+(surf->vertices[2]*cos(dYaw));
-            surf->vertices[3] = (surf->vertices[3]*cos(dYaw))-(surf->vertices[5]*sin(dYaw));
-            surf->vertices[5] = (surf->vertices[3]*sin(dYaw))+(surf->vertices[5]*cos(dYaw));
-            surf->vertices[6] = (surf->vertices[6]*cos(dYaw))-(surf->vertices[8]*sin(dYaw));
-            surf->vertices[8] = (surf->vertices[6]*sin(dYaw))+(surf->vertices[8]*cos(dYaw));
+            x1 = (surf->vertices[0]*cos(dYaw))-(surf->vertices[2]*sin(dYaw));
+            z1 = (surf->vertices[0]*sin(dYaw))+(surf->vertices[2]*cos(dYaw));
+            x2 = (surf->vertices[3]*cos(dYaw))-(surf->vertices[5]*sin(dYaw));
+            z2 = (surf->vertices[3]*sin(dYaw))+(surf->vertices[5]*cos(dYaw));
+            x3 = (surf->vertices[6]*cos(dYaw))-(surf->vertices[8]*sin(dYaw));
+            z3 = (surf->vertices[6]*sin(dYaw))+(surf->vertices[8]*cos(dYaw));
+     
+            surf->vertices[0] = x1;
+            surf->vertices[2] = z1;
+            surf->vertices[3] = x2;
+            surf->vertices[5] = z2;
+            surf->vertices[6] = x3;
+            surf->vertices[8] = z3;
 
         }
-        posX = (posX*cos(dYaw))-(posZ*sin(dYaw));
-        posZ = (posX*sin(dYaw))+(posZ*cos(dYaw));
+        nposX = (posX*cos(dYaw))-(posZ*sin(dYaw));
+        nposZ = (posX*sin(dYaw))+(posZ*cos(dYaw));
+        posX = nposX;
+        posZ = nposZ;
     }
     if(dPitch!=0) {
 
         for(auto surf = mesh.begin(); surf != mesh.end(); ++surf) {
             // Rotate every vertice around the origin
-            surf->vertices[2] = (surf->vertices[2]*cos(dPitch))-(surf->vertices[1]*sin(dPitch));
-            surf->vertices[1] = (surf->vertices[2]*sin(dPitch))+(surf->vertices[1]*cos(dPitch));
-            surf->vertices[5] = (surf->vertices[5]*cos(dPitch))-(surf->vertices[4]*sin(dPitch));
-            surf->vertices[4] = (surf->vertices[5]*sin(dPitch))+(surf->vertices[4]*cos(dPitch));
-            surf->vertices[8] = (surf->vertices[8]*cos(dPitch))-(surf->vertices[7]*sin(dPitch));
-            surf->vertices[7] = (surf->vertices[8]*sin(dPitch))+(surf->vertices[7]*cos(dPitch));
+            z1 = (surf->vertices[2]*cos(dPitch))-(surf->vertices[1]*sin(dPitch));
+            y1 = (surf->vertices[2]*sin(dPitch))+(surf->vertices[1]*cos(dPitch));
+            z2 = (surf->vertices[5]*cos(dPitch))-(surf->vertices[4]*sin(dPitch));
+            y2 = (surf->vertices[5]*sin(dPitch))+(surf->vertices[4]*cos(dPitch));
+            z3 = (surf->vertices[8]*cos(dPitch))-(surf->vertices[7]*sin(dPitch));
+            y3 = (surf->vertices[8]*sin(dPitch))+(surf->vertices[7]*cos(dPitch));
+
+            surf->vertices[1] = y1;
+            surf->vertices[2] = z1;
+            surf->vertices[4] = y2;
+            surf->vertices[5] = z2;
+            surf->vertices[7] = y3;
+            surf->vertices[8] = z3;
 
         }
-        posZ = (posZ*cos(dPitch))-(posY*sin(dPitch));
-        posY = (posZ*sin(dPitch))+(posY*cos(dPitch));
+        nposZ = (posZ*cos(dPitch))-(posY*sin(dPitch));
+        nposY = (posZ*sin(dPitch))+(posY*cos(dPitch));
+        posZ = nposZ;
+        posY = nposY;
     }
     if(dRoll!=0) {
         for(auto surf = mesh.begin(); surf != mesh.end(); ++surf) {
             // Rotate every vertice around the origin
-            surf->vertices[1] = (surf->vertices[1]*cos(dRoll))-(surf->vertices[2]*sin(dRoll));
-            surf->vertices[2] = (surf->vertices[1]*sin(dRoll))+(surf->vertices[2]*cos(dRoll));
-            surf->vertices[4] = (surf->vertices[4]*cos(dRoll))-(surf->vertices[5]*sin(dRoll));
-            surf->vertices[5] = (surf->vertices[4]*sin(dRoll))+(surf->vertices[5]*cos(dRoll));
-            surf->vertices[7] = (surf->vertices[7]*cos(dRoll))-(surf->vertices[8]*sin(dRoll));
-            surf->vertices[8] = (surf->vertices[7]*sin(dRoll))+(surf->vertices[8]*cos(dRoll));
+            x1 = (surf->vertices[0]*cos(dRoll))-(surf->vertices[1]*sin(dRoll));
+            y1 = (surf->vertices[0]*sin(dRoll))+(surf->vertices[1]*cos(dRoll));
+            x2 = (surf->vertices[3]*cos(dRoll))-(surf->vertices[4]*sin(dRoll));
+            y2 = (surf->vertices[3]*sin(dRoll))+(surf->vertices[4]*cos(dRoll));
+            x3 = (surf->vertices[6]*cos(dRoll))-(surf->vertices[7]*sin(dRoll));
+            y3 = (surf->vertices[6]*sin(dRoll))+(surf->vertices[7]*cos(dRoll));
+                
+            surf->vertices[0] = x1;
+            surf->vertices[1] = y1;
+            surf->vertices[3] = x2;
+            surf->vertices[4] = y2;
+            surf->vertices[6] = x3;
+            surf->vertices[7] = y3;
 
         }
-        posX = (posX*cos(dRoll))-(posY*sin(dRoll));
-        posY = (posX*sin(dRoll))+(posY*cos(dRoll));
+        nposX = (posX*cos(dRoll))-(posY*sin(dRoll));
+        nposY = (posX*sin(dRoll))+(posY*cos(dRoll));
+        posX = nposX;
+        posY = nposY;
     }
+
 }
 
 void Object::objectRotate(float dYaw, float dPitch, float dRoll)
