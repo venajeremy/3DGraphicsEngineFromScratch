@@ -74,18 +74,17 @@ private:
     float zDy;
     float zDx;
 
-	float cameraFov;
-	float cameraX;
-	float cameraY;
-	float cameraZ;
-	float cameraYaw;
-	float cameraPitch;
-	float movementSpeed;
-	float sensitivity;
+    float cameraFov;
+    float cameraX;
+    float cameraY;
+    float cameraZ;
+    float cameraYaw;
+    float cameraPitch;
+    float movementSpeed;
+    float sensitivity;
     float dY;
     float dP;
-	int disX;
+    int disX;
 	int disY;
 
-    std::vector<Surface> mesh;
-};
+    std::vector<Surface> mesh;};

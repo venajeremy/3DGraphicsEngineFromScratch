@@ -135,21 +135,21 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         
         //Slope 1:
         if (screenY1-screenY2 == 0){
-            slope1 = 9999;
+            slope1 = (float)(screenX1-screenX2);
         } else {
             slope1 = ((float)(screenX1-screenX2)/(float)(screenY1-screenY2));
         }
 
         //Slope 2:
         if (screenY2-screenY3 == 0){
-            slope2 = 9999;
+            slope2 = (float)(screenX2-screenX3);
         } else {
             slope2 = ((float)(screenX2-screenX3)/(float)(screenY2-screenY3));
         }
 
         //Slope 3:
         if (screenY3-screenY1 == 0){
-            slope3 = 9999;
+            slope3 = (float)(screenX3-screenX1);
         } else {
             slope3 = ((float)(screenX3-screenX1)/(float)(screenY3-screenY1));
         }
