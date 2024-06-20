@@ -64,9 +64,11 @@ private:
 
     int xPos;
 
-    int top;
-    int middle;
-    int bottom;
+
+
+    int xPos1;
+    int xPos2;
+    int xPos3;
 
     float zCalcDenominator;
     float zDy;
