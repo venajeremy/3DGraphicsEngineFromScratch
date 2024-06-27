@@ -17,6 +17,7 @@ World::World(SDL_Renderer *inputRenderer, float inputCameraFov, int displayX, in
 	cameraZ = 0.0f;
 	cameraYaw = 0.0f;
 	cameraPitch = 0.0f;
+    cameraRoll = 0.0f;
 	sensitivity = 0.001f;
 	// Make Mouse Movement Relative
 	SDL_SetRelativeMouseMode(SDL_TRUE);
@@ -26,12 +27,7 @@ void World::handleInput(SDL_Event const &event){
 	switch(event.type)
 	{
 		case SDL_MOUSEMOTION:
-            dY = event.motion.xrel*sensitivity;
-            dP = event.motion.yrel*sensitivity;
-			cameraYaw = cameraYaw-dY;
-			cameraPitch = cameraPitch-dP;
-            handleRotation(dY,0,0);
-            handleRotation(0,dP,0);
+            handleRotation(event.motion.xrel,event.motion.yrel,0);
 		case SDL_KEYDOWN:
 			Uint8 const *keys = SDL_GetKeyboardState(nullptr);
 			if(keys[SDL_SCANCODE_W] == 1){
@@ -55,18 +51,28 @@ void World::handleInput(SDL_Event const &event){
 	}
 }
 
-void World::handleMovement(float dX, float dY, float dZ){
-    //Move every object in world
-    for(auto obj = objects.begin(); obj != objects.end(); obj++) {
-        obj->worldTranslate(dX,dY,dZ);
+void World::handleMovement(float forwards, float upwards, float sideways){
+
+    // This is standing camera movement similar to most videogame's camera control
+    if(forwards!=0){
+        cameraX += (forwards*cos(cameraPitch)*sin(cameraYaw));
+        cameraY += (forwards*sin(cameraPitch));
+        cameraZ += (forwards*cos(cameraPitch)*cos(cameraYaw));
+    }
+    if(upwards!=0){
+        cameraY += upwards;
+    }
+    if(sideways!=0){
+        cameraX += (sideways*cos(cameraPitch)*sin(cameraYaw+(M_PI/2)));
+        cameraY += (sideways*sin(cameraPitch));
+        cameraZ += (sideways*cos(cameraPitch)*cos(cameraYaw+(M_PI/2)));
     }
 }
 
 void World::handleRotation(float dYaw, float dPitch, float dRoll){
-    //Rotate every object in world around camera
-    for(auto obj = objects.begin(); obj != objects.end(); obj++) {
-        obj->worldRotate(dYaw,dPitch,dRoll);
-    }
+    
+    cameraYaw += dYaw*sensitivity;
+    cameraPitch += dPitch*sensitivity;
 
 }
 
@@ -175,7 +181,6 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         //                  4 if so, draw the pixel and add its z value to the buffer
         
         for(int i = smallestY; i<=greatestY; i++){
-
             
             // 1
             // Calculate the x position on every line at a given y
@@ -240,10 +245,11 @@ void World::renderTriPolygon(float x1, float y1, float z1,
                                    
                     // Calculate the z of current pixel
                     pixZ = z1 + (-((zDy*(j-screenX1))+(zDx*(i-screenY1)))/(zCalcDenominator));
+                    //pixZ = (std::sqrt((x1*x1)+(z1*z1))+std::sqrt((x2*x2)+(z2*z2))+std::sqrt((x3*x3)+(z3*z3)))/3;
 
                     // 4 pixZ < currZ
                     if((pixZ < currZ)||(currZ==-1)){
-                        
+                        //SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
                         zBuffer[(((i-1)*disX)+j)-1] = pixZ;
                         SDL_RenderDrawPoint(renderer, j,i);
 
@@ -284,7 +290,7 @@ void World::renderEdgeTriPolygon(float x1, float y1, float z1,
 
 void World::renderObject(Object object)
 {
-    mesh = object.getMesh();
+    mesh = object.getMesh(cameraX,cameraY,cameraZ,cameraPitch,cameraYaw,cameraRoll);
     for(auto surface = mesh.begin(); surface != mesh.end(); ++surface) {
         // Only render object if it is infront of the camera (these positions are relative)
         if(surface->vertices[2]>0.0f && surface->vertices[5]>0.0f && surface->vertices[8]>0.0f){

@@ -46,8 +46,4 @@ Render textures onto zBuffer
 
 TODO:
 
-Add mouse movement
-
-Organize
-
-Create functions for rasterization
+Rotating yaw needs to be independant of pitch.  If the camera is canted upwards we should still be rotating around the defualt j unit vector (not the canted one)

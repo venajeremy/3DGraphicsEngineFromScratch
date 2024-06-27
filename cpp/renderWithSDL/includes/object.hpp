@@ -21,9 +21,10 @@ public:
     Object(std::vector<Surface> inMesh, float inPosX, float inPosY, float inPosZ, float inYaw, float inPitch, float inRoll);
     
     void worldTranslate(float dX, float dY, float dZ);
-    void worldRotate(float dYaw, float dPitch, float dRoll);
+    void worldRotateGrounded(float dYaw, float dPitch, float dRoll);
+    void worldRotateFloating(float dYaw, float dPitch, float dRoll);
     void objectRotate(float dYaw, float dPitch, float dRoll);
-    std::vector<Surface> getMesh();
+    std::vector<Surface> getMesh(float cameraX,float cameraY,float cameraZ,float cameraPitch,float cameraYaw,float cameraRoll);
 
 private:
     std::vector<Surface> mesh;
@@ -49,4 +50,11 @@ private:
     float yaw;
     float pitch;
     float roll;
+
+    float sinYaw;
+    float cosYaw;
+    float sinPitch;
+    float cosPitch;
+    float sinRoll;
+    float cosRoll;
 };

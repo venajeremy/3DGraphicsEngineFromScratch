@@ -19,7 +19,7 @@ public:
     void renderWorld();
 
 private:
-    void handleMovement(float dX, float dY, float dZ);
+    void handleMovement(float forwards, float upwards, float sideways);
     void handleRotation(float dYaw, float dPitch, float dRoll);
 
     void renderObject(Object object);
@@ -80,6 +80,7 @@ private:
     float cameraZ;
     float cameraYaw;
     float cameraPitch;
+    float cameraRoll;
     float movementSpeed;
     float sensitivity;
     float dY;
