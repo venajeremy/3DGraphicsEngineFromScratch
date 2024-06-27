@@ -19,10 +19,7 @@ class Object
 {
 public:
     Object(std::vector<Surface> inMesh, float inPosX, float inPosY, float inPosZ, float inYaw, float inPitch, float inRoll);
-    
-    void worldTranslate(float dX, float dY, float dZ);
-    void worldRotateGrounded(float dYaw, float dPitch, float dRoll);
-    void worldRotateFloating(float dYaw, float dPitch, float dRoll);
+    void objectTranslate(float dX, float dY, float dZ);
     void objectRotate(float dYaw, float dPitch, float dRoll);
     std::vector<Surface> getMesh(float cameraX,float cameraY,float cameraZ,float cameraPitch,float cameraYaw,float cameraRoll);
 

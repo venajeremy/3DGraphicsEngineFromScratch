@@ -31,18 +31,13 @@ void World::handleInput(SDL_Event const &event){
 		case SDL_KEYDOWN:
 			Uint8 const *keys = SDL_GetKeyboardState(nullptr);
 			if(keys[SDL_SCANCODE_W] == 1){
-                handleMovement(0, 0, movementSpeed);
+                handleMovement(movementSpeed,0,0);
             }else if(keys[SDL_SCANCODE_S] == 1){
-				handleMovement(0, 0, -movementSpeed);
+				handleMovement(-movementSpeed,0,0);
             }else if(keys[SDL_SCANCODE_A] == 1){
-				handleMovement(-movementSpeed, 0, 0);
+				handleMovement(0,0,-movementSpeed);
             }else if(keys[SDL_SCANCODE_D] == 1){
-				handleMovement(movementSpeed, 0, 0);
-            }else if(keys[SDL_SCANCODE_G] == 1){
-				objects.begin()->objectRotate(0.05f, 0, 0);
-            }else if(keys[SDL_SCANCODE_H] == 1){
-				objects.begin()->objectRotate(-0.05f, 0, 0);
-
+				handleMovement(0,0,movementSpeed);
             }
 
 
@@ -56,7 +51,7 @@ void World::handleMovement(float forwards, float upwards, float sideways){
     // This is standing camera movement similar to most videogame's camera control
     if(forwards!=0){
         cameraX += (forwards*cos(cameraPitch)*sin(cameraYaw));
-        cameraY += (forwards*sin(cameraPitch));
+        cameraY += -(forwards*sin(cameraPitch));
         cameraZ += (forwards*cos(cameraPitch)*cos(cameraYaw));
     }
     if(upwards!=0){
@@ -64,7 +59,6 @@ void World::handleMovement(float forwards, float upwards, float sideways){
     }
     if(sideways!=0){
         cameraX += (sideways*cos(cameraPitch)*sin(cameraYaw+(M_PI/2)));
-        cameraY += (sideways*sin(cameraPitch));
         cameraZ += (sideways*cos(cameraPitch)*cos(cameraYaw+(M_PI/2)));
     }
 }
