@@ -129,9 +129,8 @@ void World::renderTriPolygon(float x1, float y1, float z1,
 
         // Find the slope of all sides of polygon (run/rise dont get confused!)
         
-        // No such thing as perfectly horizontal ;)  (wont make a difference this is just for pixels on monitor, we would need a monitor with more than 9999 pixels horizontal to see a 1 pixel error)
+        // If side is perfectly horizontal just make it the length of the side
 
-       
         //Slope 1:
         if (screenY1-screenY2 == 0){
             slope1 = (float)(screenX1-screenX2);
@@ -162,9 +161,9 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         }
 
         // Used in zbuffer calculation
-        a = (((screenY2-screenY1)*(z3-z1))-((z2-z1)*(screenY3-screenY1)));
+        a = (((screenY2-screenY1)*(1/z3-1/z1))-((1/z2-1/z1)*(screenY3-screenY1)));
 
-        b = (((z2-z1)*(screenX3-screenX1))-((screenX2-screenX1)*(z3-z1)));
+        b = (((1/z2-1/z1)*(screenX3-screenX1))-((screenX2-screenX1)*(1/z3-1/z1)));
 
 
         // Draw every pixel ( zBuffer[(((i-1)*disX)+j)-1] is the current pixel on the buffer ) ( bigger z is further away from camera )
@@ -175,8 +174,9 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         
         for(int i = smallestY; i<=greatestY; i++){
             
-            // 1
-            // Calculate the x position on every line at a given y
+            // 1    NOTE: this portion can be made faster.  We instead could seperate the triangle into two portions a top and a bottom, then find the respective lines for the left and right of the top and bottom portions.  Then over two loops draw the top and bottom portions of the triangle.  I feel like this method is kinda messy though as you dont know which of the 3 lins is going to cary over between the top and bottom portions so I didn't do it
+            
+            // Calculate the left and right x positions on every line at a given y
             
             xPos = 0;
             
@@ -228,28 +228,16 @@ void World::renderTriPolygon(float x1, float y1, float z1,
                 currZ = zBuffer[(((i-1)*disX)+j)-1];
                 if(z1<currZ || z2<currZ || z3<currZ ||currZ==-1){
                     // 3
-                    
-                    // Uses formula for plane between three points.  Uses 2d x and y with 3d z pos of points.  ( this might be a problem, though i hope not )
-
-                    //pixZ = z1 + (-((((screenY2-screenY1)*(z3-z1)-(z2-z1)*(screenY3-screenY1))*(j-screenX1))+(((z2-z1)*(screenX3-screenX1)-(screenX2-screenX1)*(z3-z1))*(i-screenY1)))/((screenX2-screenX1)*(screenY3-screenY1)-(screenY2-screenY1)*(screenX3-screenX1)));
-            
+                                
                     // Portions of the above formula are calculated above as they do not need to be calculated differently for each pixel. i and j (our x and y) are the only variables changing per pixel
 
+                    // Uses equation of plane in 2D space on screen with respect to 1/z.  Since we are only dealing with planes in 3 space their change in z with respect to the the change in pixels on the screen will be linear when we only use 1/z.
                                    
                     // Calculate the z of current pixel
-                    pixZ = 1/(z1 + (-((a*(j-screenX1))+(b*(i-screenY1)))/c));
-                    //pixZ = (std::sqrt((x1*x1)+(z1*z1))+std::sqrt((x2*x2)+(z2*z2))+std::sqrt((x3*x3)+(z3*z3)))/3;
-
-                    if(pixZ>largestZ){
-                        largestZ=pixZ;
-                    }
-                    if(pixZ<smallestZ){
-                        smallestZ=pixZ;
-                    }
-                    //SDL_SetRenderDrawColor(renderer,(((pixZ-smallestZ)/(largestZ-smallestZ))*color.at(0)),color.at(1),color.at(2),255);
-                    // 4 pixZ < currZ
-                    if((pixZ > currZ)||(currZ==-1)){
-                        //SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                    pixZ = 1.0 / ( 1.0/z1 + (-((a*(j-screenX1))+(b*(i-screenY1)))/c));
+                    
+                    if((pixZ < currZ)||(currZ==-1)){
+                        // 4
                         zBuffer[(((i-1)*disX)+j)-1] = pixZ;
                         SDL_RenderDrawPoint(renderer, j,i);
 
