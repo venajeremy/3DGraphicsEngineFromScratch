@@ -40,7 +40,6 @@ void World::handleInput(SDL_Event const &event){
 				handleMovement(0,0,movementSpeed);
             }
 
-
             break;
 
 	}
@@ -79,9 +78,9 @@ std::tuple<int, int> World::renderPointRelative(float ix,float iy,float iz)
         iz = 0.0001f;
     }
 	
-    float xAngle = atan((ix)/(iz));
+    float xAngle = (ix)/(iz);
     
-    float yAngle = atan((-iy)/(iz));
+    float yAngle = (-iy)/(iz);
 
     return std::make_tuple(disX*(((cameraFov/2)+xAngle)/cameraFov),disY*(((cameraFov/2)+yAngle)/cameraFov));
 	
@@ -132,7 +131,7 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         
         // No such thing as perfectly horizontal ;)  (wont make a difference this is just for pixels on monitor, we would need a monitor with more than 9999 pixels horizontal to see a 1 pixel error)
 
-        
+       
         //Slope 1:
         if (screenY1-screenY2 == 0){
             slope1 = (float)(screenX1-screenX2);
@@ -153,19 +152,19 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         } else {
             slope3 = ((float)(screenX3-screenX1)/(float)(screenY3-screenY1));
         }
-        
+
 
         // Used in zbuffer calculation
-        zCalcDenominator = ((screenX2-screenX1)*(screenY3-screenY1)-(screenY2-screenY1)*(screenX3-screenX1)); 
+        c = (((screenX2-screenX1)*(screenY3-screenY1))-((screenY2-screenY1)*(screenX3-screenX1))); 
         // Check for divide by zero
-        if(zCalcDenominator==0){
-            zCalcDenominator==0.001;
+        if(c==0){
+            c=0.001;
         }
 
         // Used in zbuffer calculation
-        zDy = ((screenY2-screenY1)*(z3-z1)-(z2-z1)*(screenY3-screenY1));
+        a = (((screenY2-screenY1)*(z3-z1))-((z2-z1)*(screenY3-screenY1)));
 
-        zDx = ((z2-z1)*(screenX3-screenX1)-(screenX2-screenX1)*(z3-z1));
+        b = (((z2-z1)*(screenX3-screenX1))-((screenX2-screenX1)*(z3-z1)));
 
 
         // Draw every pixel ( zBuffer[(((i-1)*disX)+j)-1] is the current pixel on the buffer ) ( bigger z is further away from camera )
@@ -238,11 +237,18 @@ void World::renderTriPolygon(float x1, float y1, float z1,
 
                                    
                     // Calculate the z of current pixel
-                    pixZ = z1 + (-((zDy*(j-screenX1))+(zDx*(i-screenY1)))/(zCalcDenominator));
+                    pixZ = 1/(z1 + (-((a*(j-screenX1))+(b*(i-screenY1)))/c));
                     //pixZ = (std::sqrt((x1*x1)+(z1*z1))+std::sqrt((x2*x2)+(z2*z2))+std::sqrt((x3*x3)+(z3*z3)))/3;
 
+                    if(pixZ>largestZ){
+                        largestZ=pixZ;
+                    }
+                    if(pixZ<smallestZ){
+                        smallestZ=pixZ;
+                    }
+                    //SDL_SetRenderDrawColor(renderer,(((pixZ-smallestZ)/(largestZ-smallestZ))*color.at(0)),color.at(1),color.at(2),255);
                     // 4 pixZ < currZ
-                    if((pixZ < currZ)||(currZ==-1)){
+                    if((pixZ > currZ)||(currZ==-1)){
                         //SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
                         zBuffer[(((i-1)*disX)+j)-1] = pixZ;
                         SDL_RenderDrawPoint(renderer, j,i);
@@ -288,6 +294,10 @@ void World::renderObject(Object object)
     for(auto surface = mesh.begin(); surface != mesh.end(); ++surface) {
         // Only render object if it is infront of the camera (these positions are relative)
         if(surface->vertices[2]>0.0f && surface->vertices[5]>0.0f && surface->vertices[8]>0.0f){
+            /*World::renderTriPolygon(surface->vertices[0], surface->vertices[1], surface->vertices[2],
+                            surface->vertices[3], surface->vertices[4], surface->vertices[5],
+                            surface->vertices[6], surface->vertices[7], surface->vertices[8], 
+                            surface->color);*/
             World::renderTriPolygon(surface->vertices[0], surface->vertices[1], surface->vertices[2],
                             surface->vertices[3], surface->vertices[4], surface->vertices[5],
                             surface->vertices[6], surface->vertices[7], surface->vertices[8], 
@@ -304,6 +314,8 @@ void World::addObject(Object object)
 void World::renderWorld()
 {
     zBuffer=emptyBuffer;
+    largestZ = -1;
+    smallestZ = 999999;
     for(auto obj = objects.begin(); obj != objects.end(); obj++) {
         renderObject(*obj);
     }

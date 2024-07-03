@@ -5,7 +5,7 @@ Application::Application()
 	m_window = SDL_CreateWindow("SDL2 Window",
 			SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED,
-			1440, 960,
+			1440, 900,
 			0);
 	if(!m_window)
 	{
@@ -24,7 +24,7 @@ Application::Application()
 	}
 
     // Create new world
-	newCamera = new World(m_render, (2*M_PI/5), 1440, 960);
+	newCamera = new World(m_render, (2*M_PI/6), 1440, 960);
 	
 
     // Create new object

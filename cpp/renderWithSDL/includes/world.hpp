@@ -64,15 +64,16 @@ private:
 
     int xPos;
 
-
+    float largestZ;
+    float smallestZ;
 
     int xPos1;
     int xPos2;
     int xPos3;
 
-    float zCalcDenominator;
-    float zDy;
-    float zDx;
+    float c;
+    float b;
+    float a;
 
     float cameraFov;
     float cameraX;
