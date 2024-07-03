@@ -154,16 +154,11 @@ void World::renderTriPolygon(float x1, float y1, float z1,
 
 
         // Used in zbuffer calculation
+        a = (((screenY2-screenY1)*(1.0/z3-1/z1))-((1.0/z2-1.0/z1)*(screenY3-screenY1)));
+
+        b = (((1.0/z2-1.0/z1)*(screenX3-screenX1))-((screenX2-screenX1)*(1.0/z3-1.0/z1)));
+
         c = (((screenX2-screenX1)*(screenY3-screenY1))-((screenY2-screenY1)*(screenX3-screenX1))); 
-        // Check for divide by zero
-        if(c==0){
-            c=0.001;
-        }
-
-        // Used in zbuffer calculation
-        a = (((screenY2-screenY1)*(1/z3-1/z1))-((1/z2-1/z1)*(screenY3-screenY1)));
-
-        b = (((1/z2-1/z1)*(screenX3-screenX1))-((screenX2-screenX1)*(1/z3-1/z1)));
 
 
         // Draw every pixel ( zBuffer[(((i-1)*disX)+j)-1] is the current pixel on the buffer ) ( bigger z is further away from camera )
@@ -228,13 +223,20 @@ void World::renderTriPolygon(float x1, float y1, float z1,
                 currZ = zBuffer[(((i-1)*disX)+j)-1];
                 if(z1<currZ || z2<currZ || z3<currZ ||currZ==-1){
                     // 3
-                                
+                            
                     // Portions of the above formula are calculated above as they do not need to be calculated differently for each pixel. i and j (our x and y) are the only variables changing per pixel
 
-                    // Uses equation of plane in 2D space on screen with respect to 1/z.  Since we are only dealing with planes in 3 space their change in z with respect to the the change in pixels on the screen will be linear when we only use 1/z.
-                                   
-                    // Calculate the z of current pixel
-                    pixZ = 1.0 / ( 1.0/z1 + (-((a*(j-screenX1))+(b*(i-screenY1)))/c));
+                    // Uses equation of plane in 2D space on screen with respect to 1/z. We have to use 1/z because the change in z with respect to the change of position on screen is not linear (due to the fact we are looking at a flat surface from an angle).
+
+                    // Ensure z1 is not zero
+                    if(z1==0){
+                        z1=0.0001;
+                    }
+                    // Calculate unrecipricated pixZ
+                    uRpixZ = 1.0/z1 + (-((a*(j-screenX1))+(b*(i-screenY1)))/c);
+
+                    // Calculate the z of current pixel with  
+                    pixZ = 1.0 / uRpixZ;
                     
                     if((pixZ < currZ)||(currZ==-1)){
                         // 4

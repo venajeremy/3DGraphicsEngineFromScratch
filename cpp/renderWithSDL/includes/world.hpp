@@ -57,6 +57,7 @@ private:
 
     float currZ;
     float pixZ;
+    float uRpixZ;
 
     float slope1;
     float slope2;
