@@ -4,6 +4,9 @@
 #include <vector>
 #include <array>
 #include <math.h>
+#include <fstream>
+#include <string>
+#include <sstream>
 
 class Surface
 {
@@ -18,13 +21,14 @@ private:
 class Object 
 {
 public:
-    Object(std::vector<Surface> inMesh, float inPosX, float inPosY, float inPosZ, float inYaw, float inPitch, float inRoll);
+    Object(std::string objectFile, float inPosX, float inPosY, float inPosZ, float inYaw, float inPitch, float inRoll);
     void objectTranslate(float dX, float dY, float dZ);
     void objectRotate(float dYaw, float dPitch, float dRoll);
     std::vector<Surface> getMesh(float cameraX,float cameraY,float cameraZ,float cameraPitch,float cameraYaw,float cameraRoll);
 
 private:
     std::vector<Surface> mesh;
+    std::vector<Surface> createMeshFromFile(std::string filename);
 
     float x1;
     float y1;

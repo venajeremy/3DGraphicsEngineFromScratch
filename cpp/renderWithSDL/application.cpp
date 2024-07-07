@@ -26,7 +26,7 @@ Application::Application()
     // Create new world
 	newCamera = new World(m_render, (2*M_PI/6), 1440, 960);
 	
-
+    /*  Old manual method
     // Create new object
     Surface s1({20.0f, 20.0f, -20.0f, -20.0f, 20.0f, -20.0f, -20.0f, -20.0f, -20.0f},{255, 255, 0, 255});
     Surface s2({20.0f, 20.0f, -20.0f, 20.0f, -20.0f, -20.0f, -20.0f, -20.0f, -20.0f},{255, 255, 0, 255});
@@ -43,22 +43,23 @@ Application::Application()
 
     std::vector<Surface> mesh({s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12});
 
-    cube = new Object(mesh, 0, 0, 100, 0, 0, 0);
+    cube = new Object(mesh, NULL, 0, 0, 100, 0, 0, 0);
     
     Surface triangleSurface({200.0f, -25.0f, 200.0f, -200.0f, -25.0f, 200.0f, 0.0f, -25.0f, -200.0f},{255, 255, 255, 255}); 
 
     std::vector<Surface> mesh2({triangleSurface});
 
-    triangle = new Object(mesh2, 0,0,100, 0, 0, 0);
+    triangle = new Object(mesh2, NULL, 0, 0, 100, 0, 0, 0);
 
     newCamera->addObject(*triangle);
     
-    for(int i = 0; i < 1; i++){
-        for(int j = 0; j < 1; j++){
-            Object *newCube = new Object(mesh,i*300,j*300,60,0,0,0);
-            newCamera->addObject(*newCube);
-        }
-    }
+    newCamera->addObject(*cube);
+    */
+
+    Object star("pickup",0,0,100,0,0,0);
+
+    newCamera->addObject(star);
+    
 
 
     draw();

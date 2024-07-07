@@ -1,8 +1,10 @@
 #include "object.hpp"
 
-Object::Object(std::vector<Surface> inMesh, float inPosX, float inPosY, float inPosZ, float inYaw, float inPitch, float inRoll)
+Object::Object(std::string objectFile, float inPosX, float inPosY, float inPosZ, float inYaw, float inPitch, float inRoll)
 {
-    mesh = inMesh;
+    
+    mesh = createMeshFromFile(objectFile);
+    
     // XYZ is relative to camera
     posX = inPosX;
     posY = inPosY;
@@ -23,6 +25,91 @@ void Object::objectTranslate(float dX, float dY, float dZ)
     posY -= dY;
     posZ -= dZ;
    
+}
+
+std::vector<Surface> Object::createMeshFromFile(std::string filename){
+
+    // Currently only support verticies "v" and faces "f"
+    std::ifstream newObject;
+    std::string filePath = "objects/"+filename+"/"+filename+".obj";
+    
+    newObject.open(filePath);
+
+    std::vector<Surface> returnMesh;
+
+    if(newObject.is_open()){
+
+        struct vertex {
+            float x,y,z;
+        };
+
+        struct face {
+            int v1,v2,v3;
+        };
+
+        std::vector<vertex> vertices;
+
+        std::string line;
+        std::istringstream iss;
+
+        std::string type;
+
+
+        while ( getline (newObject,line) ) {
+            // Read each line
+            iss.clear(); 
+            iss.str(line);
+            iss >> type;
+
+            std::cout << type << "\n";
+
+            if(type == "v"){
+                
+                // Add vertex
+                // Find x,y,z (there are more options that are aviable in obj files but i dont feel like supporting them rn
+                vertex newVertex;
+                iss >> newVertex.x >> newVertex.y >> newVertex.z;
+
+                vertices.push_back(newVertex);
+
+                std::cout << "added new vertex\n";
+                
+            }
+
+            if(type == "usemtl"){
+                
+                // Equipt mtl file
+            }
+            
+            if(type == "f"){
+                
+                // Add surface using the vertices created
+                face newFace;
+                iss >> newFace.v1 >> newFace.v2 >> newFace.v3;
+
+                newFace.v1-=1;
+                newFace.v2-=1;
+                newFace.v3-=1;
+
+                Surface newSurface({vertices[newFace.v1].x,vertices[newFace.v1].y,vertices[newFace.v1].z,vertices[newFace.v2].x,vertices[newFace.v2].y,vertices[newFace.v2].z,vertices[newFace.v3].x,vertices[newFace.v3].y,vertices[newFace.v3].z},{255,255,0,255});
+
+                returnMesh.push_back(newSurface);
+
+                std::cout << "added new surface\n";
+            }
+
+
+
+
+
+        }
+        newObject.close();
+
+    } else {
+        std::cout << "Could Not Open Object: " << filename << "\n";
+    }
+
+    return returnMesh;
 }
 
 std::vector<Surface> Object::getMesh(float cameraX,float cameraY,float cameraZ,float cameraPitch,float cameraYaw,float cameraRoll)
