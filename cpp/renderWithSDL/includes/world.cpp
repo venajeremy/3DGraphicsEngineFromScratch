@@ -267,6 +267,8 @@ void World::renderEdgeTriPolygon(float x1, float y1, float z1,
 	std::tuple<float , float > p2 = renderPointRelative(x2, y2, z2);
 	std::tuple<float , float > p3 = renderPointRelative(x3, y3, z3);
 
+    SDL_SetRenderDrawColor(renderer,255, 255, 255, 255);
+
 	// p1 to p2
 	SDL_RenderDrawLine(renderer,std::get<0>(p1),std::get<1>(p1),std::get<0>(p2),std::get<1>(p2));
 
@@ -284,7 +286,7 @@ void World::renderObject(Object object)
     for(auto surface = mesh.begin(); surface != mesh.end(); ++surface) {
         // Only render object if it is infront of the camera (these positions are relative)
         if(surface->vertices[2]>0.0f && surface->vertices[5]>0.0f && surface->vertices[8]>0.0f){
-            /*World::renderTriPolygon(surface->vertices[0], surface->vertices[1], surface->vertices[2],
+            /*World::renderEdgeTriPolygon(surface->vertices[0], surface->vertices[1], surface->vertices[2],
                             surface->vertices[3], surface->vertices[4], surface->vertices[5],
                             surface->vertices[6], surface->vertices[7], surface->vertices[8], 
                             surface->color);*/

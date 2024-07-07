@@ -25,40 +25,10 @@ Application::Application()
 
     // Create new world
 	newCamera = new World(m_render, (2*M_PI/6), 1440, 960);
-	
-    /*  Old manual method
-    // Create new object
-    Surface s1({20.0f, 20.0f, -20.0f, -20.0f, 20.0f, -20.0f, -20.0f, -20.0f, -20.0f},{255, 255, 0, 255});
-    Surface s2({20.0f, 20.0f, -20.0f, 20.0f, -20.0f, -20.0f, -20.0f, -20.0f, -20.0f},{255, 255, 0, 255});
-    Surface s3({20.0f, 20.0f, -20.0f, 20.0f, -20.0f, -20.0f, 20.0f, -20.0f, 20.0f},{255, 0, 255, 255});
-    Surface s4({20.0f, 20.0f, -20.0f, 20.0f, 20.0f, 20.0f, 20.0f, -20.0f, 20.0f},{255, 0, 255, 255});
-    Surface s5({20.0f, 20.0f, -20.0f, 20.0f, 20.0f, 20.0f, -20.0f, 20.0f, 20.0f},{255, 0, 0, 255});
-    Surface s6({20.0f, 20.0f, -20.0f, -20.0f, 20.0f, -20.0f, -20.0f, 20.0f, 20.0f},{255, 0, 0, 255});
-    Surface s7({-20.0f, 20.0f, -20.0f, -20.0f, 20.0f, 20.0f, -20.0f, -20.0f, 20.0f},{0, 255, 255, 255});
-    Surface s8({-20.0f, 20.0f, -20.0f, -20.0f, -20.0f, -20.0f, -20.0f, -20.0f, 20.0f},{0, 255, 255, 255});
-    Surface s9({20.0f, -20.0f, -20.0f, -20.0f, -20.0f, -20.0f, -20.0f, -20.0f, 20.0f},{0, 255, 0, 255});
-    Surface s10({20.0f, -20.0f, -20.0f, 20.0f, -20.0f, 20.0f, -20.0f, -20.0f, 20.0f},{0, 255, 0, 255});
-    Surface s11({-20.0f, -20.0f, 20.0f, 20.0f, -20.0f, 20.0f, 20.0f, 20.0f, 20.0f},{0, 0, 255, 255});
-    Surface s12({-20.0f, -20.0f, 20.0f, -20.0f, 20.0f, 20.0f, 20.0f, 20.0f, 20.0f},{0, 0, 255, 255});
 
-    std::vector<Surface> mesh({s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12});
+    Object city("city",0,0,100,0,0,0);
 
-    cube = new Object(mesh, NULL, 0, 0, 100, 0, 0, 0);
-    
-    Surface triangleSurface({200.0f, -25.0f, 200.0f, -200.0f, -25.0f, 200.0f, 0.0f, -25.0f, -200.0f},{255, 255, 255, 255}); 
-
-    std::vector<Surface> mesh2({triangleSurface});
-
-    triangle = new Object(mesh2, NULL, 0, 0, 100, 0, 0, 0);
-
-    newCamera->addObject(*triangle);
-    
-    newCamera->addObject(*cube);
-    */
-
-    Object star("pickup",0,0,100,0,0,0);
-
-    newCamera->addObject(star);
+    newCamera->addObject(city);
     
 
 
@@ -68,7 +38,6 @@ Application::Application()
 Application::~Application()
 {
 	delete newCamera;
-    delete cube;
 	SDL_DestroyRenderer(m_render);
 	SDL_DestroyWindow(m_window);
 }

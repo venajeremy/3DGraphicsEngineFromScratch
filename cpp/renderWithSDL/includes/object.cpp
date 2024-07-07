@@ -61,8 +61,6 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
             iss.str(line);
             iss >> type;
 
-            std::cout << type << "\n";
-
             if(type == "v"){
                 
                 // Add vertex
@@ -71,8 +69,6 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
                 iss >> newVertex.x >> newVertex.y >> newVertex.z;
 
                 vertices.push_back(newVertex);
-
-                std::cout << "added new vertex\n";
                 
             }
 
@@ -95,7 +91,6 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
 
                 returnMesh.push_back(newSurface);
 
-                std::cout << "added new surface\n";
             }
 
 
@@ -119,7 +114,7 @@ std::vector<Surface> Object::getMesh(float cameraX,float cameraY,float cameraZ,f
     // For each vertex apply object relative position translation
     std::vector<Surface> returnMesh = mesh;
     for(auto it = returnMesh.begin(); it != returnMesh.end(); ++it) {
-        // Add Position Of object and subtract position of camera
+        // Rotate object (still need to do this), add its position and subtract position of camera
         it->vertices[0] += posX-cameraX;
         it->vertices[1] += posY-cameraY;
         it->vertices[2] += posZ-cameraZ;
@@ -130,7 +125,9 @@ std::vector<Surface> Object::getMesh(float cameraX,float cameraY,float cameraZ,f
         it->vertices[7] += posY-cameraY;
         it->vertices[8] += posZ-cameraZ;
 
-        // Rotate every vertice around the origin
+        // Rotate every vertice around the camera
+        
+        // Calculate sin and cos
         sinPitch = sin(cameraPitch);
         cosPitch = cos(cameraPitch);
         sinYaw = sin(cameraYaw);

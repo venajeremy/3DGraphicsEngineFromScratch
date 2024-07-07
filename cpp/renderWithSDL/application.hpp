@@ -16,15 +16,11 @@ public:
 	void update(double delta_time);
 	void draw();
 private:
+    World *newCamera;
+
 	SDL_Window	*m_window;
 	SDL_Surface	*m_window_surface;
 	SDL_Renderer	*m_render;
 	SDL_Event	m_window_event;
-	
-	World	*newCamera;
-
-    Object   *cube;
-
-    Object  *triangle;
 
 };
