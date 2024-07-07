@@ -26,9 +26,11 @@ Application::Application()
     // Create new world
 	newCamera = new World(m_render, (2*M_PI/6), 1440, 960);
 
-    Object city("city",0,0,100,0,0,0);
+    Object arduino("arduino",0,0,100,0,0,0);
+    newCamera->addObject(arduino);
 
-    newCamera->addObject(city);
+    //Object star("star",0,0,100,0,0,0);
+    //newCamera->addObject(star);
     
 
 

@@ -29,15 +29,94 @@ void Object::objectTranslate(float dX, float dY, float dZ)
 
 std::vector<Surface> Object::createMeshFromFile(std::string filename){
 
+    // Used for reading files:
+    std::string line;
+    std::istringstream iss;
+    std::string type;
+
+
+
+
+    // Read .mtl
+    // Currently only supports color from Kd (diffuse color)
+    struct diffuseColor {
+        float r,g,b;
+    };
+    struct material {
+        std::string name;
+        diffuseColor dColor;
+    };
+
+    std::ifstream materialsFile;
+    std::string materialPath = "objects/"+filename+"/obj.mtl";
+
+    materialsFile.open(materialPath);
+
+    std::vector<material> materials;
+
+    if(materialsFile.is_open()){
+        
+
+        std::string name = "";
+        float diffuseColorR;
+        float diffuseColorG;
+        float diffuseColorB;
+
+
+        while ( getline (materialsFile,line) ) {
+            // Read each line
+            iss.clear(); 
+            iss.str(line);
+            iss >> type;
+
+            if(type == "newmtl"){
+                if(name == ""){
+                    // If this is the first material to be added
+                    iss >> name;
+                } else {
+                    // If its not the first material add the previous info into the materials list
+                    material newMaterial;
+                    newMaterial.name = name;
+                    newMaterial.dColor.r = diffuseColorR;
+                    newMaterial.dColor.g = diffuseColorG;
+                    newMaterial.dColor.b = diffuseColorB;
+                    materials.push_back(newMaterial);
+                    iss >> name;
+                }
+            }
+            
+            // currently only supports "Kd" which is the diffuse color
+            if(type == "Kd"){
+                iss >> diffuseColorR >> diffuseColorG >> diffuseColorB;
+            }
+
+        }
+        material newMaterial;
+        newMaterial.name = name;
+        newMaterial.dColor.r = diffuseColorR;
+        newMaterial.dColor.g = diffuseColorG;
+        newMaterial.dColor.b = diffuseColorB;
+        materials.push_back(newMaterial);
+
+
+        materialsFile.close();
+
+    } else {
+        std::cout << "Could Not Open Materials File For Object: " << filename << "\n";
+        std::cout << "Object must be in the objects folder and with the naming objects/<name>/obj.mtl\n";
+    }
+
+
+    // Read .obj
     // Currently only support verticies "v" and faces "f"
-    std::ifstream newObject;
+    std::ifstream objectFile;
     std::string filePath = "objects/"+filename+"/"+filename+".obj";
     
-    newObject.open(filePath);
+    objectFile.open(filePath);
 
     std::vector<Surface> returnMesh;
 
-    if(newObject.is_open()){
+    if(objectFile.is_open()){
 
         struct vertex {
             float x,y,z;
@@ -45,17 +124,16 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
 
         struct face {
             int v1,v2,v3;
+            material mat;
         };
 
         std::vector<vertex> vertices;
 
-        std::string line;
-        std::istringstream iss;
+        material currentMaterial;
 
-        std::string type;
-
-
-        while ( getline (newObject,line) ) {
+        std::string materialName;
+        
+        while ( getline (objectFile,line) ) {
             // Read each line
             iss.clear(); 
             iss.str(line);
@@ -73,8 +151,18 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
             }
 
             if(type == "usemtl"){
-                
+                iss >> materialName;
                 // Equipt mtl file
+                for(material materialSearch : materials){
+                    
+                    if(materialSearch.name == materialName){
+                        // Set color of surface
+                        currentMaterial = materialSearch;
+                    }
+                }
+                if(currentMaterial.name!=materialName){
+                    std::cout << "Object file trying to use material: " << materialName << " not found in .mtl file!";
+                }
             }
             
             if(type == "f"){
@@ -87,7 +175,7 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
                 newFace.v2-=1;
                 newFace.v3-=1;
 
-                Surface newSurface({vertices[newFace.v1].x,vertices[newFace.v1].y,vertices[newFace.v1].z,vertices[newFace.v2].x,vertices[newFace.v2].y,vertices[newFace.v2].z,vertices[newFace.v3].x,vertices[newFace.v3].y,vertices[newFace.v3].z},{255,255,0,255});
+                Surface newSurface({vertices[newFace.v1].x,vertices[newFace.v1].y,vertices[newFace.v1].z,vertices[newFace.v2].x,vertices[newFace.v2].y,vertices[newFace.v2].z,vertices[newFace.v3].x,vertices[newFace.v3].y,vertices[newFace.v3].z},{round(255.0f*currentMaterial.dColor.r),round(255.0f*currentMaterial.dColor.g),round(255.0f*currentMaterial.dColor.b),255});
 
                 returnMesh.push_back(newSurface);
 
@@ -98,10 +186,11 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
 
 
         }
-        newObject.close();
+        objectFile.close();
 
     } else {
         std::cout << "Could Not Open Object: " << filename << "\n";
+        std::cout << "Object must be in the objects folder and with the naming objects/<name>/<name>.obj\n";
     }
 
     return returnMesh;
