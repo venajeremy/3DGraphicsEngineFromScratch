@@ -37,8 +37,8 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
 
 
 
-    // Read .mtl
-    // Currently only supports color from Kd (diffuse color)
+    // Store materials from .mtl
+    
     struct diffuseColor {
         float r,g,b;
     };
@@ -47,68 +47,34 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
         diffuseColor dColor;
     };
 
-    std::ifstream materialsFile;
-    std::string materialPath = "objects/"+filename+"/obj.mtl";
-
-    materialsFile.open(materialPath);
-
     std::vector<material> materials;
 
-    if(materialsFile.is_open()){
-        
+    struct vertex {
+        float x,y,z;
+    };
 
-        std::string name = "";
-        float diffuseColorR;
-        float diffuseColorG;
-        float diffuseColorB;
+    struct textureCoord {
+        int u,v;
+    };
 
+    struct normal {
+        float x,y,z;
+    };
 
-        while ( getline (materialsFile,line) ) {
-            // Read each line
-            iss.clear(); 
-            iss.str(line);
-            iss >> type;
+    struct spaceVert {
+        float u,v,w;
+    };
 
-            if(type == "newmtl"){
-                if(name == ""){
-                    // If this is the first material to be added
-                    iss >> name;
-                } else {
-                    // If its not the first material add the previous info into the materials list
-                    material newMaterial;
-                    newMaterial.name = name;
-                    newMaterial.dColor.r = diffuseColorR;
-                    newMaterial.dColor.g = diffuseColorG;
-                    newMaterial.dColor.b = diffuseColorB;
-                    materials.push_back(newMaterial);
-                    iss >> name;
-                }
-            }
-            
-            // currently only supports "Kd" which is the diffuse color
-            if(type == "Kd"){
-                iss >> diffuseColorR >> diffuseColorG >> diffuseColorB;
-            }
+    struct face {
+        int v1,v2,v3,vt1,vt2,vt3,vn1,vn2,vn3,vp1,vp2,vp3;
+        material mat;
+    };
 
-        }
-        material newMaterial;
-        newMaterial.name = name;
-        newMaterial.dColor.r = diffuseColorR;
-        newMaterial.dColor.g = diffuseColorG;
-        newMaterial.dColor.b = diffuseColorB;
-        materials.push_back(newMaterial);
-
-
-        materialsFile.close();
-
-    } else {
-        std::cout << "Could Not Open Materials File For Object: " << filename << "\n";
-        std::cout << "Object must be in the objects folder and with the naming objects/<name>/obj.mtl\n";
-    }
-
+    std::vector<vertex> vertices;
+    
 
     // Read .obj
-    // Currently only support verticies "v" and faces "f"
+    
     std::ifstream objectFile;
     std::string filePath = "objects/"+filename+"/"+filename+".obj";
     
@@ -118,26 +84,83 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
 
     if(objectFile.is_open()){
 
-        struct vertex {
-            float x,y,z;
-        };
-
-        struct face {
-            int v1,v2,v3;
-            material mat;
-        };
-
-        std::vector<vertex> vertices;
 
         material currentMaterial;
 
         std::string materialName;
+
+        int faceCornerCout;
         
         while ( getline (objectFile,line) ) {
             // Read each line
+            std::replace(line.begin(), line.end(), '/', ' ');
             iss.clear(); 
             iss.str(line);
             iss >> type;
+            
+            if(type == "mtllib"){
+                // Read .mtl
+                std::string mtlName;
+                iss >> mtlName;
+                std::ifstream materialsFile;
+                std::string materialPath = "objects/"+filename+"/"+mtlName;
+
+                materialsFile.open(materialPath);
+
+                
+                if(materialsFile.is_open()){
+                    
+
+                    std::string name = "";
+                    float diffuseColorR;
+                    float diffuseColorG;
+                    float diffuseColorB;
+
+
+                    while ( getline (materialsFile,line) ) {
+                        // Read each line
+                        iss.clear(); 
+                        iss.str(line);
+                        iss >> type;
+
+                        if(type == "newmtl"){
+                            if(name == ""){
+                                // If this is the first material to be added
+                                iss >> name;
+                            } else {
+                                // If its not the first material add the previous info into the materials list
+                                material newMaterial;
+                                newMaterial.name = name;
+                                newMaterial.dColor.r = diffuseColorR;
+                                newMaterial.dColor.g = diffuseColorG;
+                                newMaterial.dColor.b = diffuseColorB;
+                                materials.push_back(newMaterial);
+                                iss >> name;
+                            }
+                        }
+                        
+                        // currently only supports "Kd" which is the diffuse color
+                        if(type == "Kd"){
+                            iss >> diffuseColorR >> diffuseColorG >> diffuseColorB;
+                        }
+
+                    }
+                    material newMaterial;
+                    newMaterial.name = name;
+                    newMaterial.dColor.r = diffuseColorR;
+                    newMaterial.dColor.g = diffuseColorG;
+                    newMaterial.dColor.b = diffuseColorB;
+                    materials.push_back(newMaterial);
+
+
+                    materialsFile.close();
+
+                } else {
+                    std::cout << "Could Not Open Materials File For Object: " << filename << "\n";
+                    std::cout << "Could Not Find: "+materialPath+"\n";
+                }
+
+            }
 
             if(type == "v"){
                 
@@ -166,10 +189,13 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
             }
             
             if(type == "f"){
-                
+                 
                 // Add surface using the vertices created
                 face newFace;
-                iss >> newFace.v1 >> newFace.v2 >> newFace.v3;
+
+                std::string s;
+
+                iss >> newFace.v1 >> newFace.vt1 >> newFace.vn1 >> newFace.v2 >> newFace.vt2 >> newFace.vn2 >> newFace.v3 >> newFace.vt3 >> newFace.vn3;
 
                 newFace.v1-=1;
                 newFace.v2-=1;
