@@ -29,11 +29,11 @@ Application::Application()
     //Object arduino("arduino",0,0,100,0,0,0);
     //newCamera->addObject(arduino);
 
-    //Object star("star",0,0,100,0,0,0);
-    //newCamera->addObject(star);
+    Object star("testpoly",0,0,100,0,0,0);
+    newCamera->addObject(star);
     
-    Object phone("phone",0,0,100,0,0,0);
-    newCamera->addObject(phone);
+    //Object phone("phone",0,0,100,0,0,0);
+    //newCamera->addObject(phone);
 
     draw();
 }

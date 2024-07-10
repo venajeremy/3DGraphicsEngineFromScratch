@@ -1,0 +1,16 @@
+# Test polygon for texture mapping
+
+mtllib obj.mtl
+
+o obj_0
+v 22.361 		20 		10
+v 10.361 		-20 		0
+v -13.09 		-10.489 		5
+# 20 vertices
+
+g group_0_16768282
+
+usemtl testtexture
+s 0
+
+f 1/0/0 2/0/0 3/0/0

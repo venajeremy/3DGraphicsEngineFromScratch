@@ -197,6 +197,8 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
 
                 iss >> newFace.v1 >> newFace.vt1 >> newFace.vn1 >> newFace.v2 >> newFace.vt2 >> newFace.vn2 >> newFace.v3 >> newFace.vt3 >> newFace.vn3;
 
+                std::cout << newFace.v1<<", "<<newFace.v2<<", "<<newFace.v3<<"\n";
+
                 newFace.v1-=1;
                 newFace.v2-=1;
                 newFace.v3-=1;
