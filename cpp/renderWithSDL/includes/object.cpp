@@ -44,6 +44,7 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
     };
     struct material {
         std::string name;
+        std::string map_Kd;
         diffuseColor dColor;
     };
 
@@ -54,7 +55,7 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
     };
 
     struct textureCoord {
-        int u,v;
+        float u,v;
     };
 
     struct normal {
@@ -71,6 +72,9 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
     };
 
     std::vector<vertex> vertices;
+    std::vector<textureCoord> textureCoords;
+    std::vector<normal> normals;
+    std::vector<spaceVert> spaceVerts;
     
 
     // Read .obj
@@ -112,6 +116,7 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
                     
 
                     std::string name = "";
+                    std::string textureMap = "";
                     float diffuseColorR;
                     float diffuseColorG;
                     float diffuseColorB;
@@ -139,14 +144,20 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
                             }
                         }
                         
-                        // currently only supports "Kd" which is the diffuse color
+                        // Kd -> diffuse color
                         if(type == "Kd"){
                             iss >> diffuseColorR >> diffuseColorG >> diffuseColorB;
+                        }
+
+                        // map_Kd -> texture map
+                        if(type == "map_Kd"){
+                            iss >> textureMap; 
                         }
 
                     }
                     material newMaterial;
                     newMaterial.name = name;
+                    newMaterial.map_Kd = textureMap;
                     newMaterial.dColor.r = diffuseColorR;
                     newMaterial.dColor.g = diffuseColorG;
                     newMaterial.dColor.b = diffuseColorB;
@@ -165,12 +176,24 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
             if(type == "v"){
                 
                 // Add vertex
-                // Find x,y,z (there are more options that are aviable in obj files but i dont feel like supporting them rn
+                // x,y,z of new vertex in vertex list
+
                 vertex newVertex;
                 iss >> newVertex.x >> newVertex.y >> newVertex.z;
 
                 vertices.push_back(newVertex);
                 
+            }
+
+            if(type == "vt"){
+
+                // Add texture coorinates
+                // u,v of new texture coord in texture coords list
+                textureCoord newTC;
+                iss >> newTC.u >> newTC.v;
+
+                textureCoords.push_back(newTC);
+
             }
 
             if(type == "usemtl"){
@@ -199,11 +222,23 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
 
                 std::cout << newFace.v1<<", "<<newFace.v2<<", "<<newFace.v3<<"\n";
 
+                // Obj file starts vertex and other lists at 1 instead of 0 as we store them
                 newFace.v1-=1;
                 newFace.v2-=1;
                 newFace.v3-=1;
+                newFace.vt1-=1;
+                newFace.vt2-=1;
+                newFace.vt3-=1;
 
-                Surface newSurface({vertices[newFace.v1].x,vertices[newFace.v1].y,vertices[newFace.v1].z,vertices[newFace.v2].x,vertices[newFace.v2].y,vertices[newFace.v2].z,vertices[newFace.v3].x,vertices[newFace.v3].y,vertices[newFace.v3].z},{round(255.0f*currentMaterial.dColor.r),round(255.0f*currentMaterial.dColor.g),round(255.0f*currentMaterial.dColor.b),255});
+                // Create new surface
+                Surface newSurface(
+                        {vertices[newFace.v1].x,vertices[newFace.v1].y,vertices[newFace.v1].z,
+                        vertices[newFace.v2].x,vertices[newFace.v2].y,vertices[newFace.v2].z,
+                        vertices[newFace.v3].x,vertices[newFace.v3].y,vertices[newFace.v3].z},
+                        {textureCoords[newFace.vt1].u,textureCoords[newFace.vt1].v,
+                        textureCoords[newFace.vt2].u,textureCoords[newFace.vt2].v,
+                        textureCoords[newFace.vt3].u,textureCoords[newFace.vt3].v},
+                        currentMaterial.map_Kd);
 
                 returnMesh.push_back(newSurface);
 
@@ -306,11 +341,14 @@ std::vector<Surface> Object::getMesh(float cameraX,float cameraY,float cameraZ,f
     
 }
 
-Surface::Surface(std::array<float,9> inVerticies, std::array<float,4> inColor)
+Surface::Surface(std::array<float,9> inVerticies, std::array<float,6> inTextureCoords, std::string inTextureMap)
 {
     // color in form r, g, b, alpha
     // verties in form x1,y1,z1,x2,y2,z3,x3,y3,z3
+    // textureCoords in form u1,v1,u2,v2,u3,v3
+    // textureMap in form of string file name (name of file inside of /textures/<obj name>/)
     vertices = inVerticies;
-    color = inColor;
+    textureCoords = inTextureCoords;
+    textureMap = inTextureMap;
 }
 

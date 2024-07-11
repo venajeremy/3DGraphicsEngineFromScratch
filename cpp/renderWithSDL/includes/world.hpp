@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 #include <tuple>
 #include <vector>
+#include <string>
 #include "object.hpp"
     
 class World
@@ -25,11 +26,15 @@ private:
     void renderObject(Object object);
 	void renderTriPolygon(float x1, float y1, float z1, 
 			float x2, float y2, float z2, 
-			float x3, float y3, float z3, std::array<float,4> color);
+			float x3, float y3, float z3, 
+            float u1, float v1,
+            float u2, float v2,
+            float u3, float v3,
+            std::string textureMap);
     void renderEdgeTriPolygon(float x1, float y1, float z1, 
 			float x2, float y2, float z2, 
 			float x3, float y3, float z3, std::array<float,4> color);
-    void rasterizePix(SDL_Renderer *renderer, int pixX, int pixY, int x1, int y1, int x2, int y2, int x3, int y3);
+
 
 	std::tuple<int, int> renderPointRelative(float ix,float iy,float iz);
 
@@ -39,6 +44,8 @@ private:
 
     std::vector<float> zBuffer;
     std::vector<float> emptyBuffer;
+
+    std::string textureFolderLocation;
 
     int smallestX;
     int smallestY;
@@ -72,9 +79,19 @@ private:
     int xPos2;
     int xPos3;
 
-    float c;
-    float b;
+    float tu_a;
+    float tv_a;
+    float tu_b;
+    float tv_b;
+    float tu_c;
+    float tv_c;
+
+    float tU;
+    float tV;
+
     float a;
+    float b;
+    float c;
 
     float cameraFov;
     float cameraX;

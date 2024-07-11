@@ -7,6 +7,9 @@ World::World(SDL_Renderer *inputRenderer, float inputCameraFov, int displayX, in
 	disX = displayX;
 	disY = displayY;
 
+    // Texture Folder
+    textureFolderLocation = "/textures/";
+
     // Initialize zBuffers
     emptyBuffer.assign(displayX*displayY,-1);
     zBuffer = emptyBuffer;
@@ -88,7 +91,11 @@ std::tuple<int, int> World::renderPointRelative(float ix,float iy,float iz)
 
 void World::renderTriPolygon(float x1, float y1, float z1,
 	    float x2, float y2, float z2,
-		float x3, float y3, float z3, std::array<float,4> color)
+		float x3, float y3, float z3, 
+        float u1, float v1,
+        float u2, float v2,
+        float u3, float v3,
+        std::string textureMap)
 {
 
     // This method takes 3 points in threespace maps them to 3 points in twospace on the window and fills the polygon depending on its visibility to the camera. A few things to take note of:
@@ -108,7 +115,7 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         screenY3 = std::get<1>(renderPointRelative(x3,y3,z3));
 
         // Set color to given ( in the future this will be replaced by some texture system )
-        SDL_SetRenderDrawColor(renderer,color.at(0),color.at(1),color.at(2),color.at(3));
+        SDL_SetRenderDrawColor(renderer,255, 0, 255, 255);
     
         // Find the min and max Y of our polygon within the window (bounding y)
         smallestY=std::min(screenY1,screenY2);
@@ -128,7 +135,7 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         greatestX=std::min(disX,greatestX);
 
         // Find the slope of all sides of polygon (run/rise dont get confused!)
-        
+        // Used in rasterization 
         // If side is perfectly horizontal just make it the length of the side
 
         //Slope 1:
@@ -152,9 +159,20 @@ void World::renderTriPolygon(float x1, float y1, float z1,
             slope3 = ((float)(screenX3-screenX1)/(float)(screenY3-screenY1));
         }
 
+        
+        // Used in texture mapping
+        // Basically equation of plane mapping u and v with respect to screenX and Y coords
+        // Similar to z position calculation in zbuffer calculation below
+        // Again this takes z into account due to screenX and Y being divisions of z
+        tu_a = (((screenY2-screenY1)*(u3/z3-u1/z1))-((u2/z2-u1/z1)*(screenY3-screenY1)));
+        tv_a = (((screenY2-screenY1)*(v3/z3-v1/z1))-((v2/z2-v1/z1)*(screenY3-screenY1)));
+        tu_b = (((u2/z2-u1/z1)*(screenX3-screenX1))-((screenX2-screenX1)*(u3/z3-u1/z1)));
+        tv_b = (((v2/z2-v1/z1)*(screenX3-screenX1))-((screenX2-screenX1)*(v3/z3-v1/z1)));
+        tu_c = (((screenX2-screenX1)*(screenY3-screenY1))-((screenY2-screenY1)*(screenX3-screenX1)));
+        tv_c = tu_c;
 
         // Used in zbuffer calculation
-        a = (((screenY2-screenY1)*(1.0/z3-1/z1))-((1.0/z2-1.0/z1)*(screenY3-screenY1)));
+        a = (((screenY2-screenY1)*(1.0/z3-1.0/z1))-((1.0/z2-1.0/z1)*(screenY3-screenY1)));
 
         b = (((1.0/z2-1.0/z1)*(screenX3-screenX1))-((screenX2-screenX1)*(1.0/z3-1.0/z1)));
 
@@ -237,7 +255,14 @@ void World::renderTriPolygon(float x1, float y1, float z1,
 
                     // Calculate the z of current pixel with  
                     pixZ = 1.0 / uRpixZ;
-                    
+                   
+                    // Calculate the texture position of pix
+                    tU = u1/z1 + (-((tu_a*(j-screenX1))+(tu_b*(i-screenY1)))/tu_c);
+                    tV = v1/z1 + (-((tv_a*(j-screenX1))+(tv_b*(i-screenY1)))/tv_c);
+
+                    tU = tU*pixZ;
+                    tV = tV*pixZ;
+
                     if((pixZ < currZ)||(currZ==-1)){
                         // 4
                         zBuffer[(((i-1)*disX)+j)-1] = pixZ;
@@ -292,8 +317,11 @@ void World::renderObject(Object object)
                             surface->color);*/
             World::renderTriPolygon(surface->vertices[0], surface->vertices[1], surface->vertices[2],
                             surface->vertices[3], surface->vertices[4], surface->vertices[5],
-                            surface->vertices[6], surface->vertices[7], surface->vertices[8], 
-                            surface->color);
+                            surface->vertices[6], surface->vertices[7], surface->vertices[8],
+                            surface->textureCoords[0],surface->textureCoords[1],
+                            surface->textureCoords[2],surface->textureCoords[3],
+                            surface->textureCoords[4],surface->textureCoords[5],
+                            surface->textureMap);
         }
     }
 }

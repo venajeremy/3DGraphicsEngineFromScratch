@@ -12,9 +12,11 @@
 class Surface
 {
 public:
-    Surface(std::array<float,9> inVerticies, std::array<float,4> color);
+    Surface(std::array<float,9> inVerticies, std::array<float,6> textureCoords, std::string inTextureMap);
     std::array<float,9> vertices;
+    std::array<float,6> textureCoords;
     std::array<float,4> color;
+    std::string textureMap;
 private:
      
 };
