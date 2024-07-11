@@ -57,10 +57,16 @@ pixel tgaReadPixel (const tgaImage inImage, float percentX, float percentY){
     size_t bytesPerPixel = inImage.bpp / 8;
     uint16_t x = (uint16_t)(inImage.width * percentX);
     uint16_t y = (uint16_t)(inImage.height * percentY);
+    x = (x>inImage.width) ? inImage.width : x;
+    x = (x<1) ? 1 : x;
+    y = (y>inImage.height) ? inImage.height : y;
+    y = (y<1) ? 1 : y;
     uint8_t r;
     uint8_t g;
     uint8_t b;
     uint8_t a=255;
+
+    //std::cout << percentX<<", "<<percentY<<"\n";
 
     size_t index = (y * inImage.width + x) * bytesPerPixel;
 
@@ -79,13 +85,4 @@ pixel tgaReadPixel (const tgaImage inImage, float percentX, float percentY){
 
     return returnPixel;
 
-};
-
-
-int main() {
-    tgaImage testtexture = decompressTGA ("textures/testtexture/testtexture.tga");
-    
-    pixel test = tgaReadPixel(testtexture, 0.8, 0.9); 
-
-    std::cout << "R: "<<(int)test.r<<", G: "<<(int)test.g<<", B: "<<(int)test.b<<", A: "<<(int)test.a<<"/n";
 };

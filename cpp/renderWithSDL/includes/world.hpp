@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include "object.hpp"
+#include "texture.hpp"
     
 class World
 {
@@ -88,6 +89,8 @@ private:
 
     float tU;
     float tV;
+
+    pixel pixTex;
 
     float a;
     float b;

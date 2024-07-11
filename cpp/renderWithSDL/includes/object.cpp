@@ -220,8 +220,6 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
 
                 iss >> newFace.v1 >> newFace.vt1 >> newFace.vn1 >> newFace.v2 >> newFace.vt2 >> newFace.vn2 >> newFace.v3 >> newFace.vt3 >> newFace.vn3;
 
-                std::cout << newFace.v1<<", "<<newFace.v2<<", "<<newFace.v3<<"\n";
-
                 // Obj file starts vertex and other lists at 1 instead of 0 as we store them
                 newFace.v1-=1;
                 newFace.v2-=1;
@@ -238,7 +236,7 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
                         {textureCoords[newFace.vt1].u,textureCoords[newFace.vt1].v,
                         textureCoords[newFace.vt2].u,textureCoords[newFace.vt2].v,
                         textureCoords[newFace.vt3].u,textureCoords[newFace.vt3].v},
-                        currentMaterial.map_Kd);
+                        "textures/"+filename+"/"+currentMaterial.map_Kd);
 
                 returnMesh.push_back(newSurface);
 

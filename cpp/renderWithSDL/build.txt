@@ -1,4 +1,4 @@
-g++ *.cpp includes/world.cpp includes/object.cpp $(sdl2-config --cflags --libs)
+g++ *.cpp includes/world.cpp includes/object.cpp includes/texture.cpp $(sdl2-config --cflags --libs)
 
 Build testing for image loader:
 g++ includes/texture.cpp

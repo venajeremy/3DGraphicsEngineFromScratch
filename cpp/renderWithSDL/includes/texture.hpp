@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <unordered_map>
 
 struct tgaImage {
     int width;
@@ -20,4 +21,7 @@ struct pixel {
 pixel tgaReadPixel (const tgaImage inImage, float percentX, float percentY);
 
 tgaImage decompressTGA (const std::string tgaFile);
+
+//unordered_map<string,tgaImage> textureCache;
+
 

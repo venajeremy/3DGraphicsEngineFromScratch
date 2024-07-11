@@ -171,6 +171,19 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         tu_c = (((screenX2-screenX1)*(screenY3-screenY1))-((screenY2-screenY1)*(screenX3-screenX1)));
         tv_c = tu_c;
 
+        tgaImage dTex = decompressTGA(textureMap);
+
+        /*
+        for(int i = 1 ; i < 40 ; i++ ) {
+            for(int j = 1 ; j < 40 ; j++ ) {
+                pixel current = tgaReadPixel(dTex, (float)j/dTex.width, (float)i/dTex.height);
+                //std::cout << "R: "<<(int)current.r<<" G: "<<(int)current.g<<" B: "<<(int)current.b<<"\n";
+                SDL_SetRenderDrawColor(renderer, (int)current.r, (int)current.g, (int)current.b, (int)current.a);
+                //SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+                SDL_RenderDrawPoint(renderer,1+j,1+i);
+            }
+        }*/
+
         // Used in zbuffer calculation
         a = (((screenY2-screenY1)*(1.0/z3-1.0/z1))-((1.0/z2-1.0/z1)*(screenY3-screenY1)));
 
@@ -260,8 +273,17 @@ void World::renderTriPolygon(float x1, float y1, float z1,
                     tU = u1/z1 + (-((tu_a*(j-screenX1))+(tu_b*(i-screenY1)))/tu_c);
                     tV = v1/z1 + (-((tv_a*(j-screenX1))+(tv_b*(i-screenY1)))/tv_c);
 
+                    // Final percentage locations on texture
+                    
                     tU = tU*pixZ;
                     tV = tV*pixZ;
+
+                    // Get pixel on texture these percentages relate to
+                    pixTex = tgaReadPixel(dTex, tU, tV);
+
+                    
+                    // Set the draw color of current pixel to the color at that point on texture
+                    SDL_SetRenderDrawColor(renderer, (int)pixTex.r, (int)pixTex.g, (int)pixTex.b, (int)pixTex.a);
 
                     if((pixZ < currZ)||(currZ==-1)){
                         // 4
