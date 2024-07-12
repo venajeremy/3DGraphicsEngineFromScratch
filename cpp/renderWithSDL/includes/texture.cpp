@@ -1,7 +1,16 @@
 #include "texture.hpp"
 
+std::unordered_map<std::string,tgaImage> textureCache;
+
 tgaImage decompressTGA (const std::string tgaFile){
     
+    // Check if tgaImage texture is already cached
+    if(auto search = textureCache.find(tgaFile); search != textureCache.end()) {
+        // Return the texture if it is cached
+        return search->second;
+    }
+
+
     // This function is mostly stolen off the internet tga images are weird and im sure this wont support every edge case
 
     tgaImage returnImage;
@@ -48,6 +57,9 @@ tgaImage decompressTGA (const std::string tgaFile){
     returnImage.height = height;
     returnImage.bpp = bpp;
     returnImage.imageData = imageData;
+
+    // Cache Texture
+    textureCache.insert({tgaFile, returnImage});
 
     return returnImage;
 };

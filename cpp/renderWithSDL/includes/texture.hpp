@@ -22,6 +22,6 @@ pixel tgaReadPixel (const tgaImage inImage, float percentX, float percentY);
 
 tgaImage decompressTGA (const std::string tgaFile);
 
-//unordered_map<string,tgaImage> textureCache;
+extern std::unordered_map<std::string,tgaImage> textureCache;
 
 
