@@ -171,7 +171,7 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         tu_c = (((screenX2-screenX1)*(screenY3-screenY1))-((screenY2-screenY1)*(screenX3-screenX1)));
         tv_c = tu_c;
 
-        tgaImage dTex = decompressTGA(textureMap);
+        dTex = decompressTGA(textureMap);
 
         /*
         for(int i = 1 ; i < 40 ; i++ ) {

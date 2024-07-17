@@ -48,6 +48,8 @@ private:
 
     std::string textureFolderLocation;
 
+    tgaImage dTex;
+
     int smallestX;
     int smallestY;
     int greatestX;

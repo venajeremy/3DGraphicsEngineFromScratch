@@ -136,6 +136,7 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
                                 // If its not the first material add the previous info into the materials list
                                 material newMaterial;
                                 newMaterial.name = name;
+                                newMaterial.map_Kd = textureMap;
                                 newMaterial.dColor.r = diffuseColorR;
                                 newMaterial.dColor.g = diffuseColorG;
                                 newMaterial.dColor.b = diffuseColorB;

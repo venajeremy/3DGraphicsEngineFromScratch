@@ -1,0 +1,22 @@
+# Test mtl for texture mapping
+
+newmtl dirtbottom
+Ka 0 0 0 
+Kd 1 1 1
+d 1
+illum 0.0
+map_Kd dirtbottom.tga
+
+newmtl grassside
+Ka 0 0 0 
+Kd 1 1 1
+d 1
+illum 0.0
+map_Kd grassside.tga
+
+newmtl grasstop
+Ka 0 0 0 
+Kd 1 1 1
+d 1
+illum 0.0
+map_Kd grasstop.tga
