@@ -173,17 +173,6 @@ void World::renderTriPolygon(float x1, float y1, float z1,
 
         dTex = decompressTGA(textureMap);
 
-        /*
-        for(int i = 1 ; i < 40 ; i++ ) {
-            for(int j = 1 ; j < 40 ; j++ ) {
-                pixel current = tgaReadPixel(dTex, (float)j/dTex.width, (float)i/dTex.height);
-                //std::cout << "R: "<<(int)current.r<<" G: "<<(int)current.g<<" B: "<<(int)current.b<<"\n";
-                SDL_SetRenderDrawColor(renderer, (int)current.r, (int)current.g, (int)current.b, (int)current.a);
-                //SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
-                SDL_RenderDrawPoint(renderer,1+j,1+i);
-            }
-        }*/
-
         // Used in zbuffer calculation
         a = (((screenY2-screenY1)*(1.0/z3-1.0/z1))-((1.0/z2-1.0/z1)*(screenY3-screenY1)));
 
@@ -248,7 +237,7 @@ void World::renderTriPolygon(float x1, float y1, float z1,
             triangleEdgeRight = std::min(disX,triangleEdgeRight);
             
 
-            for(int j = triangleEdgeLeft; j<=triangleEdgeRight; j++){
+            for(int j = triangleEdgeLeft-1; j<=triangleEdgeRight-1; j++){
                 // 2
                 
                 currZ = zBuffer[(((i-1)*disX)+j)-1];
