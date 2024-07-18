@@ -1,0 +1,9 @@
+# Test mtl for texture mapping
+
+newmtl leaves
+Ka 0 0 0 
+Kd 1 0.8666666666666667 0.10196078431372549
+d 1
+illum 0.0
+map_Kd leaves.tga
+

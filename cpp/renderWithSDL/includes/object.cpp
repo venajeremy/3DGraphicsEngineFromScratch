@@ -243,7 +243,7 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
 
             }
 
-
+            type = "";
 
 
 

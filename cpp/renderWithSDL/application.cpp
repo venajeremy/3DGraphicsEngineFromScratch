@@ -16,6 +16,9 @@ Application::Application()
 		return;
 	}
 
+    //Make Fullscreen
+    //SDL_SetWindowFullscreen(m_window,SDL_WINDOW_FULLSCREEN);
+
 	m_render = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED);
 
 	if(!m_render)
@@ -34,12 +37,28 @@ Application::Application()
     //Object grass("grass",0,0,100,0,0,0);
     //newCamera->addObject(grass);
 
-    for(int m = 0 ; m < 5 ; m++){
-        for(int n = 0 ; n < 5 ; n++){
+    //Create small minecraft world
+    //Create glass plane
+    /*
+    for(int m = 0 ; m < 10 ; m++){
+        for(int n = 0 ; n < 10 ; n++){
             Object grass("grass",0+100*m,0,100+100*n,0,0,0);
             newCamera->addObject(grass);
         }
+    }*/
+    for(int m = 0 ; m < 1 ; m++){
+        Object wood("wood",800,100+100*m,1200,0,0,0);
+        newCamera->addObject(wood);
     }
+    /*
+    for(int m = 0 ; m < 3; m++){
+        for(int n = 0 ; n < 3 ; n++){
+            for(int o = 0 ; o < 3 ; o++){
+                Object leaves("leaves",700+100*m,400+100*o,1000+100*n,0,0,0);
+                newCamera->addObject(leaves);
+            }
+        }
+    }*/
     
     //Object phone("phone",0,0,100,0,0,0);
     //newCamera->addObject(phone);

@@ -1,0 +1,16 @@
+# Test mtl for texture mapping
+
+newmtl woodtop
+Ka 0 0 0 
+Kd 1 1 1
+d 1
+illum 0.0
+map_Kd woodtop.tga
+
+newmtl woodside
+Ka 0 0 0 
+Kd 1 1 1
+d 1
+illum 0.0
+map_Kd woodside.tga
+
