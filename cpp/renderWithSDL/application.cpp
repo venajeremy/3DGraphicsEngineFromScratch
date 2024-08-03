@@ -36,35 +36,89 @@ Application::Application()
 
     //Object grass("grass",0,0,100,0,0,0);
     //newCamera->addObject(grass);
-
-    //Create small minecraft world
-    //Create glass plane
-    /*
-    for(int m = 0 ; m < 10 ; m++){
-        for(int n = 0 ; n < 10 ; n++){
-            Object grass("grass",0+100*m,0,100+100*n,0,0,0);
-            newCamera->addObject(grass);
-        }
-    }*/
-    for(int m = 0 ; m < 1 ; m++){
-        Object wood("wood",800,100+100*m,1200,0,0,0);
-        newCamera->addObject(wood);
-    }
-    /*
-    for(int m = 0 ; m < 3; m++){
-        for(int n = 0 ; n < 3 ; n++){
-            for(int o = 0 ; o < 3 ; o++){
-                Object leaves("leaves",700+100*m,400+100*o,1000+100*n,0,0,0);
-                newCamera->addObject(leaves);
-            }
-        }
-    }*/
     
     //Object phone("phone",0,0,100,0,0,0);
     //newCamera->addObject(phone);
     
     //Object sword("sword",0,0,100,0,0,0);
     //newCamera->addObject(sword);
+
+    //Create small minecraft world
+    //Create glass plane
+    
+    for(int m = -2 ; m < 10 ; m++){
+        for(int n = -2 ; n < 10 ; n++){
+            Object grass("grass",0+100*m,0,100+100*n,0,0,0);
+            newCamera->addObject(grass);
+        }
+    }
+    //Create tree trunk
+    for(int m = 0 ; m < 4 ; m++){
+        Object wood("wood",800,100+100*m,700,0,0,0);
+        newCamera->addObject(wood);
+    }
+    //Leaves bottom 
+    for(int m = 0 ; m < 5; m++){
+        for(int n = 0 ; n < 5 ; n++){
+            for(int o = 0 ; o < 3 ; o++){
+                Object leaves("leaves",600+100*m,400+100*o,500+100*n,0,0,0);
+                newCamera->addObject(leaves);
+            }
+        }
+    }
+    //Leaves top
+    for(int m = 0 ; m < 3; m++){
+        for(int n = 0 ; n < 3 ; n++){
+            for(int o = 0 ; o < 2 ; o++){
+                Object leaves("leaves",700+100*m,700+100*o,600+100*n,0,0,0);
+                newCamera->addObject(leaves);
+            }
+        }
+    }
+    //Create House
+    //Create Pillars
+    for(int m = 0 ; m < 4 ; m++){
+        Object wood("wood",300,100+100*m,300,0,0,0);
+        newCamera->addObject(wood);
+    }
+    for(int m = 0 ; m < 4 ; m++){
+        Object wood("wood",-200,100+100*m,800,0,0,0);
+        newCamera->addObject(wood);
+    }
+    for(int m = 0 ; m < 4 ; m++){
+        Object wood("wood",300,100+100*m,800,0,0,0);
+        newCamera->addObject(wood);
+    }
+    for(int m = 0 ; m < 4 ; m++){
+        Object wood("wood",-200,100+100*m,300,0,0,0);
+        newCamera->addObject(wood);
+    }
+    //Create Walls
+    for(int m = 0 ; m < 4 ; m++){
+        for(int n = 0 ; n < 4 ; n++){
+            Object cobble("cobble",-200,100+100*m,400+100*n,0,0,0);
+            newCamera->addObject(cobble);
+        }
+    }
+    for(int m = 0 ; m < 4 ; m++){
+        for(int n = 0 ; n < 4 ; n++){
+            Object cobble("cobble",300,100+100*m,400+100*n,0,0,0);
+            newCamera->addObject(cobble);
+        }
+    }
+    for(int m = 0 ; m < 4 ; m++){
+        for(int n = 0 ; n < 4 ; n++){
+            Object cobble("cobble",-100+100*n,100+100*m,800,0,0,0);
+            newCamera->addObject(cobble);
+        }
+    }
+    //Create Roof
+    for(int m = 0 ; m < 6 ; m++){
+        for(int n = 0 ; n < 6 ; n++){
+            Object planks("planks",-200+100*n,500,300+100*m,0,0,0);
+            newCamera->addObject(planks);
+        }
+    }
 
     draw();
 }
