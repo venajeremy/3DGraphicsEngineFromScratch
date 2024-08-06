@@ -50,7 +50,9 @@
 3. ZBuffer Calculation:  We have finished rendering our 3d triangle onto the screen. Though, what if we have another triangle that is behind our original triangle.  How will our program know which one to render and which one to hide?  To solve this issue we will use a ZBuffer.  Our ZBuffer is just an array that contains a value for every pixel in our window.  This value will represent the distance every point is from us (more accuratly from the XY plane).  With this ZBuffer we now only render a pixel on the screen if its z value is less than the current value in the z buffer.
 
 *The calculation of the ZBuffer value of a pixel on a triangle is actually quite difficult.  We must find a formula to find the difference in z in 3D space with respect to change in x' and y' in 2D space (on the screen).  What makes this problem difficult is that the change in z with respect to screen space is not linear.  If you move one pixel across the screen the change in distance to the flat surface you are rendering will not be constant. Take for example this image:*
+
 ![image](https://github.com/user-attachments/assets/87fc47b2-7d0e-4b88-9912-a88dcc113217)
+
 *Here you can see that change in distance to the wall is not constant between pixels.  To interpolate the depth linearly with respect to screen space, we use the fact that the screen coordinates x' and y' where found by via their 3D coordinates divided by their depth: x' = x/z, y' = y/z.*
 *We know that in 3 space our flat surface satisfies the equation of a plane ax + by + cz = d, but we need some way to find z in this equation only given screen coordinates x' and y'.  Or in other words, if given a pixel on the screen we a way to find the distance to the polygon at that point.  a, b, c, and d can all be calculated via cross product and a single point, so we are left with two unknowns: x and y.  z being our desired output.*
 
