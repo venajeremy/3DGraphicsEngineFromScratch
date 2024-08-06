@@ -1,5 +1,7 @@
 # Graphics Engine Built From Scratch
 
+https://github.com/user-attachments/assets/9d4aa576-04ab-4941-ba8a-2275db5969b5
+
 ## What Is This?
 
 ### I have always been fascinated by 3D graphics and have always wanted to write my own renderer entirely from scratch.  
