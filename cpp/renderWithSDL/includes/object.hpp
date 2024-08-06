@@ -28,6 +28,10 @@ public:
     void objectTranslate(float dX, float dY, float dZ);
     void objectRotate(float dYaw, float dPitch, float dRoll);
     std::vector<Surface> getMesh(float cameraX,float cameraY,float cameraZ,float cameraPitch,float cameraYaw,float cameraRoll);
+    float getDistance(float cameraX,float cameraY,float cameraZ);
+    float posX;
+    float posY;
+    float posZ;
 
 private:
     std::vector<Surface> mesh;
@@ -42,10 +46,8 @@ private:
     float x3;
     float y3;
     float z3;
-
-    float posX;
-    float posY;
-    float posZ;
+    
+    
 
     float nposX;
     float nposY;

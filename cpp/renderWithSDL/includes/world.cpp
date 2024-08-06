@@ -98,15 +98,12 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         std::string textureMap)
 {
 
-    // This method takes 3 points in threespace maps them to 3 points in twospace on the window and fills the polygon depending on its visibility to the camera. A few things to take note of:
-
-	// - Given Threespace Coordinates are relative to camera
-	// - Z axis is horizontal to forward direction (when viewed from above). We do not calculate the actual distance to the point.  This speeds rendering, but forces us to rotate our world around the camera.
+    // This method takes 3 points in threespace maps them to 3 points in twospace on the window and fills the polygon depending on its visibility to the camera.
 
     // We only want to render if at least one vertex of the polygon is infront of the camera
     if (z1>0 || z2>0 || z3>0) { 
 
-        // Use helper function to translate get twospace coordinates of vertexes relative to the camera
+        // Use helper function to get twospace coordinates of vertexes relative to the camera
         screenX1 = std::get<0>(renderPointRelative(x1,y1,z1));
         screenX2 = std::get<0>(renderPointRelative(x2,y2,z2));
         screenX3 = std::get<0>(renderPointRelative(x3,y3,z3));
@@ -114,9 +111,33 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         screenY2 = std::get<1>(renderPointRelative(x2,y2,z2));
         screenY3 = std::get<1>(renderPointRelative(x3,y3,z3));
 
-        // Set color to given ( in the future this will be replaced by some texture system )
-        SDL_SetRenderDrawColor(renderer,255, 0, 255, 255);
-    
+        // Occulded polygon optimization
+        // Find the current zbuffer distances at the 3 verticies of the current triangle and see if our verticies would be closer to the camera
+        // If the current verticies are not visible to the camera and behind an object rendered this frame do not draw the rest of the triangle
+        // This optimization is more effective if every object in the scene is sorted by its distance from the camera
+        if(screenX1 > 0 && screenX1 < disX && screenY1 > 0 && screenY1 < disY){
+            currZ1 = zBuffer[(((screenY1-1)*disX)+screenX1)-1];
+        } else {
+            currZ1 = -1;
+        }
+        if(screenX2 > 0 && screenX2 < disX && screenY2 > 0 && screenY2 < disY){
+            currZ2 = zBuffer[(((screenY2-1)*disX)+screenX2)-1];
+        } else {
+            currZ2 = -1;
+        }
+        if(screenX3 > 0 && screenX3 < disX && screenY3 > 0 && screenY3 < disY){
+            currZ3 = zBuffer[(((screenY3-1)*disX)+screenX3)-1];
+        } else {
+            currZ3 = -1;
+        }
+        if((z1>currZ1+1 && currZ1 != -1)
+        && (z2>currZ2+1 && currZ2 != -1)
+        && (z3>currZ3+1 && currZ3 != -1)){
+            return;
+        }
+
+        // ---------------- BEGIN RASTERIZATION -----------------
+
         // Find the min and max Y of our polygon within the window (bounding y)
         smallestY=std::min(screenY1,screenY2);
         smallestY=std::min(smallestY,screenY3);
@@ -125,14 +146,6 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         greatestY=std::max(screenY1,screenY2);
         greatestY=std::max(greatestY,screenY3);
         greatestY=std::min(disY,greatestY);
-
-        smallestX=std::min(screenX1,screenX2);
-        smallestX=std::min(smallestX,screenX3);
-        smallestX=std::max(1,smallestX);
-
-        greatestX=std::max(screenX1,screenX2);
-        greatestX=std::max(greatestX,screenX3);
-        greatestX=std::min(disX,greatestX);
 
         // Find the slope of all sides of polygon (run/rise dont get confused!)
         // Used in rasterization 
@@ -160,8 +173,8 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         }
 
         
-        // Used in texture mapping
-        // Basically equation of plane mapping u and v with respect to screenX and Y coords
+        // Used later in texture mapping
+        // Basically equation of plane mapping u and v with respect to screenX and screenY coords
         // Similar to z position calculation in zbuffer calculation below
         // Again this takes z into account due to screenX and Y being divisions of z
         tu_a = (((screenY2-screenY1)*(u3/z3-u1/z1))-((u2/z2-u1/z1)*(screenY3-screenY1)));
@@ -171,9 +184,10 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         tu_c = (((screenX2-screenX1)*(screenY3-screenY1))-((screenY2-screenY1)*(screenX3-screenX1)));
         tv_c = tu_c;
 
+        // Get my own texture object from the provided textureMap file
         dTex = decompressTGA(textureMap);
 
-        // Used in zbuffer calculation
+        // Used in zbuffer calculation (later will build a function of x' and y' outputting 1/z')
         a = (((screenY2-screenY1)*(1.0/z3-1.0/z1))-((1.0/z2-1.0/z1)*(screenY3-screenY1)));
 
         b = (((1.0/z2-1.0/z1)*(screenX3-screenX1))-((screenX2-screenX1)*(1.0/z3-1.0/z1)));
@@ -237,7 +251,7 @@ void World::renderTriPolygon(float x1, float y1, float z1,
             triangleEdgeRight = std::min(disX,triangleEdgeRight);
             
 
-            for(int j = triangleEdgeLeft-1; j<=triangleEdgeRight-1; j++){
+            for(int j = triangleEdgeLeft; j<=triangleEdgeRight; j++){
                 // 2
                 
                 currZ = zBuffer[(((i-1)*disX)+j)-1];
@@ -257,7 +271,7 @@ void World::renderTriPolygon(float x1, float y1, float z1,
 
                     // Calculate the z of current pixel with  
                     pixZ = 1.0 / uRpixZ;
-                   
+                    
                     // Calculate the texture position of pix
                     tU = u1/z1 + (-((tu_a*(j-screenX1))+(tu_b*(i-screenY1)))/tu_c);
                     tV = v1/z1 + (-((tv_a*(j-screenX1))+(tv_b*(i-screenY1)))/tv_c);
@@ -285,6 +299,7 @@ void World::renderTriPolygon(float x1, float y1, float z1,
                 }
             }
         }
+    
     
     }
 	
@@ -342,11 +357,19 @@ void World::addObject(Object object)
     objects.push_back(object);
 }
 
+bool World::compairObjectDistance(Object object1, Object object2){
+    return (object1.getDistance(cameraX,cameraY,cameraZ)<object2.getDistance(cameraX,cameraY,cameraZ));
+}
+
 void World::renderWorld()
 {
+    // Clear the Zbuffer
     zBuffer=emptyBuffer;
-    largestZ = -1;
-    smallestZ = 999999;
+    // Sort the objects by their distance from the screen
+    std::sort(objects.begin(), objects.end(),  [this](Object& obj1, Object& obj2) {
+        return compairObjectDistance(obj1, obj2);
+    });
+    // Render all objects in scene
     for(auto obj = objects.begin(); obj != objects.end(); obj++) {
         renderObject(*obj);
     }

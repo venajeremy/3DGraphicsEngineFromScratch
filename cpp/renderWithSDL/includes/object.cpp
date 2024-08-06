@@ -258,6 +258,11 @@ std::vector<Surface> Object::createMeshFromFile(std::string filename){
     return returnMesh;
 }
 
+float Object::getDistance(float cameraX,float cameraY,float cameraZ)
+{
+    return sqrt(sqrt(pow(cameraX-posX,2)+pow(cameraZ-posZ,2))+pow(cameraY-posY,2));
+}
+
 std::vector<Surface> Object::getMesh(float cameraX,float cameraY,float cameraZ,float cameraPitch,float cameraYaw,float cameraRoll)
 {
     // Returns the mesh of the object (lot of parts to this)
