@@ -38,16 +38,13 @@ Application::Application()
     // Create new world
 	newCamera = new World(m_render, (2*M_PI/6), renderX, renderY);
 
-    //Object arduino("arduino",0,0,100,0,0,0);
-    //newCamera->addObject(arduino);
-
     //Object grass("grass",0,0,100,0,0,0);
     //newCamera->addObject(grass);
     
-    //Object phone("phone",0,0,100,0,0,0);
+    //Object phone("phone",0,100,100,0,0,0);
     //newCamera->addObject(phone);
     
-    //Object sword("sword",0,0,100,0,0,0);
+    //Object sword("sword",0,500,100,0,0,0);
     //newCamera->addObject(sword);
 
     
