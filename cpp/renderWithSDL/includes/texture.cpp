@@ -68,6 +68,8 @@ pixel tgaReadPixel (const std::string tgaFile, float percentX, float percentY){
 
     tgaImage *inImage = decompressTGA(tgaFile);
 
+    percentY = 1.0-percentY;
+
     size_t bytesPerPixel = inImage->bpp / 8;
     uint16_t x = (uint16_t)(inImage->width * percentX);
     uint16_t y = (uint16_t)(inImage->height * percentY);
@@ -79,8 +81,6 @@ pixel tgaReadPixel (const std::string tgaFile, float percentX, float percentY){
     uint8_t g;
     uint8_t b;
     uint8_t a=255;
-
-    //std::cout << percentX<<", "<<percentY<<"\n";
 
     size_t index = (y * inImage->width + x) * bytesPerPixel;
 

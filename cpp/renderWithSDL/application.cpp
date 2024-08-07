@@ -41,8 +41,8 @@ Application::Application()
     //Object grass("grass",0,0,100,0,0,0);
     //newCamera->addObject(grass);
     
-    //Object phone("phone",0,100,100,0,0,0);
-    //newCamera->addObject(phone);
+    Object phone("phone",0,100,100,0,0,0);
+    newCamera->addObject(phone);
     
     //Object sword("sword",0,500,100,0,0,0);
     //newCamera->addObject(sword);
