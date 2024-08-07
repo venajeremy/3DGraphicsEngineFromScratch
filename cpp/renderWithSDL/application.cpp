@@ -2,12 +2,15 @@
 
 Application::Application()
 {
-    int resX = 720;
-    int resY = 550;
+    int windowX = 1440;
+    int windowY = 810;
+    int renderX = 288;
+    int renderY = 162;
+
 	m_window = SDL_CreateWindow("SDL2 Window",
 			SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED,
-			resX, resY,
+			windowX, windowY,
 			0);
 	if(!m_window)
 	{
@@ -15,9 +18,6 @@ Application::Application()
 		std::cout << "SDL2 Error: " << SDL_GetError() << "\n";
 		return;
 	}
-
-    //Make Fullscreen
-    //SDL_SetWindowFullscreen(m_window,SDL_WINDOW_FULLSCREEN);
 
 	m_render = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED);
 
@@ -28,8 +28,15 @@ Application::Application()
 		return;
 	}
 
+    // Make Fullscreen
+    //SDL_SetWindowFullscreen(m_window,SDL_WINDOW_FULLSCREEN);
+
+    // Stretch render resolution to window resolution
+    SDL_RenderSetScale(m_render,((float)windowX/(float)renderX),((float)windowY/(float)renderY));
+
+
     // Create new world
-	newCamera = new World(m_render, (2*M_PI/6), resX, resY);
+	newCamera = new World(m_render, (2*M_PI/6), renderX, renderY);
 
     //Object arduino("arduino",0,0,100,0,0,0);
     //newCamera->addObject(arduino);
@@ -43,9 +50,11 @@ Application::Application()
     //Object sword("sword",0,0,100,0,0,0);
     //newCamera->addObject(sword);
 
+    
+    
+    
     //Create small minecraft world
     //Create glass plane
-    
     for(int m = -2 ; m < 10 ; m++){
         for(int n = -2 ; n < 10 ; n++){
             Object grass("grass",0+100*m,0,100+100*n,0,0,0);
@@ -119,6 +128,7 @@ Application::Application()
             newCamera->addObject(planks);
         }
     }
+    
 
     draw();
 }
