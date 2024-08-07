@@ -184,9 +184,6 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         tu_c = (((screenX2-screenX1)*(screenY3-screenY1))-((screenY2-screenY1)*(screenX3-screenX1)));
         tv_c = tu_c;
 
-        // Get my own texture object from the provided textureMap file
-        dTex = decompressTGA(textureMap);
-
         // Used in zbuffer calculation (later will build a function of x' and y' outputting 1/z')
         a = (((screenY2-screenY1)*(1.0/z3-1.0/z1))-((1.0/z2-1.0/z1)*(screenY3-screenY1)));
 
@@ -282,8 +279,7 @@ void World::renderTriPolygon(float x1, float y1, float z1,
                     tV = tV*pixZ;
 
                     // Get pixel on texture these percentages relate to
-                    pixTex = tgaReadPixel(dTex, tU, tV);
-
+                    pixTex = tgaReadPixel(textureMap, tU, tV);
                     
                     // Set the draw color of current pixel to the color at that point on texture
                     SDL_SetRenderDrawColor(renderer, (int)pixTex.r, (int)pixTex.g, (int)pixTex.b, (int)pixTex.a);

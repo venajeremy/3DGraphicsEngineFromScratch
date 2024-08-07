@@ -18,9 +18,9 @@ struct pixel {
     uint8_t r,g,b,a;
 };
 
-pixel tgaReadPixel (const tgaImage inImage, float percentX, float percentY);
+pixel tgaReadPixel (const std::string tgaFile, float percentX, float percentY);
 
-tgaImage decompressTGA (const std::string tgaFile);
+tgaImage *decompressTGA (const std::string tgaFile);
 
 extern std::unordered_map<std::string,tgaImage> textureCache;
 

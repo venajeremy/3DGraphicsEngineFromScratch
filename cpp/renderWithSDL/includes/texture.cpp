@@ -2,23 +2,23 @@
 
 std::unordered_map<std::string,tgaImage> textureCache;
 
-tgaImage decompressTGA (const std::string tgaFile){
+tgaImage *decompressTGA (const std::string tgaFile){
      
     // Check if tgaImage texture is already cached
     if(auto search = textureCache.find(tgaFile); search != textureCache.end()) {
         // Return the texture if it is cached
-        return search->second;
+        return &(search->second);
     }
 
 
     // This function is mostly stolen off the internet tga images are weird and im sure this wont support every edge case
 
-    tgaImage returnImage;
+    tgaImage decompressedImage;
 
     std::ifstream file(tgaFile, std::ios::binary);
     if (!file.is_open()) {
         std::cerr << "Error opening file: "<<tgaFile<<"\n";
-        return returnImage;
+        return nullptr;
     }
 
     char header[18];
@@ -53,25 +53,27 @@ tgaImage decompressTGA (const std::string tgaFile){
 
     file.close();
    
-    returnImage.width = width;
-    returnImage.height = height;
-    returnImage.bpp = bpp;
-    returnImage.imageData = imageData;
+    decompressedImage.width = width;
+    decompressedImage.height = height;
+    decompressedImage.bpp = bpp;
+    decompressedImage.imageData = imageData;
 
     // Cache Texture
-    textureCache.insert({tgaFile, returnImage});
+    textureCache.insert({tgaFile, decompressedImage});
 
-    return returnImage;
+    return decompressTGA(tgaFile);
 };
 
-pixel tgaReadPixel (const tgaImage inImage, float percentX, float percentY){
+pixel tgaReadPixel (const std::string tgaFile, float percentX, float percentY){
 
-    size_t bytesPerPixel = inImage.bpp / 8;
-    uint16_t x = (uint16_t)(inImage.width * percentX);
-    uint16_t y = (uint16_t)(inImage.height * percentY);
-    x = (x>inImage.width) ? inImage.width : x;
+    tgaImage *inImage = decompressTGA(tgaFile);
+
+    size_t bytesPerPixel = inImage->bpp / 8;
+    uint16_t x = (uint16_t)(inImage->width * percentX);
+    uint16_t y = (uint16_t)(inImage->height * percentY);
+    x = (x>inImage->width) ? inImage->width : x;
     x = (x<0) ? 0 : x;
-    y = (y>inImage.height) ? inImage.height : y;
+    y = (y>inImage->height) ? inImage->height : y;
     y = (y<0) ? 0 : y;
     uint8_t r;
     uint8_t g;
@@ -80,17 +82,17 @@ pixel tgaReadPixel (const tgaImage inImage, float percentX, float percentY){
 
     //std::cout << percentX<<", "<<percentY<<"\n";
 
-    size_t index = (y * inImage.width + x) * bytesPerPixel;
+    size_t index = (y * inImage->width + x) * bytesPerPixel;
 
-    if ( inImage.bpp == 24 ) {
-        r = inImage.imageData[index+2];
-        g = inImage.imageData[index+1];
-        b = inImage.imageData[index+0];
+    if ( inImage->bpp == 24 ) {
+        r = inImage->imageData[index+2];
+        g = inImage->imageData[index+1];
+        b = inImage->imageData[index+0];
     } else {
-        r = inImage.imageData[index+2];
-        g = inImage.imageData[index+1];
-        b = inImage.imageData[index+0];
-        a = inImage.imageData[index+3];
+        r = inImage->imageData[index+2];
+        g = inImage->imageData[index+1];
+        b = inImage->imageData[index+0];
+        a = inImage->imageData[index+3];
     }
 
     pixel returnPixel={r,g,b,a};
