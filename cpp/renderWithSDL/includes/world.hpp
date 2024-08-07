@@ -26,7 +26,7 @@ private:
     void handleMovement(float forwards, float upwards, float sideways);
     void handleRotation(float dYaw, float dPitch, float dRoll);
 
-    void renderObject(Object object);
+    void renderObject(Object *object);
 	void renderTriPolygon(float x1, float y1, float z1, 
 			float x2, float y2, float z2, 
 			float x3, float y3, float z3, 
@@ -38,7 +38,7 @@ private:
 			float x2, float y2, float z2, 
 			float x3, float y3, float z3, std::array<float,4> color);
             
-    bool compairObjectDistance(Object object1, Object object2);
+    bool compairObjectDistance(Object *object1, Object *object2);
     
 
 	std::tuple<int, int> renderPointRelative(float ix,float iy,float iz);

@@ -111,7 +111,7 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         screenY2 = std::get<1>(renderPointRelative(x2,y2,z2));
         screenY3 = std::get<1>(renderPointRelative(x3,y3,z3));
 
-        // Occulded polygon optimization
+        // Depth Culling optimization
         // Find the current zbuffer distances at the 3 verticies of the current triangle and see if our verticies would be closer to the camera
         // If the current verticies are not visible to the camera and behind an object rendered this frame do not draw the rest of the triangle
         // This optimization is more effective if every object in the scene is sorted by its distance from the camera
@@ -331,9 +331,9 @@ void World::renderEdgeTriPolygon(float x1, float y1, float z1,
 	
 }
 
-void World::renderObject(Object object)
+void World::renderObject(Object *object)
 {
-    mesh = object.getMesh(cameraX,cameraY,cameraZ,cameraPitch,cameraYaw,cameraRoll);
+    mesh = object->getMesh(cameraX,cameraY,cameraZ,cameraPitch,cameraYaw,cameraRoll);
     for(auto surface = mesh.begin(); surface != mesh.end(); ++surface) {
         // Only render object if it is infront of the camera (these positions are relative)
         if(surface->vertices[2]>0.0f && surface->vertices[5]>0.0f && surface->vertices[8]>0.0f){
@@ -357,20 +357,20 @@ void World::addObject(Object object)
     objects.push_back(object);
 }
 
-bool World::compairObjectDistance(Object object1, Object object2){
-    return (object1.getDistance(cameraX,cameraY,cameraZ)<object2.getDistance(cameraX,cameraY,cameraZ));
+bool World::compairObjectDistance(Object *object1, Object *object2){
+    return (object1->getDistance(cameraX,cameraY,cameraZ)<object2->getDistance(cameraX,cameraY,cameraZ));
 }
 
 void World::renderWorld()
 {
     // Clear the Zbuffer
     zBuffer=emptyBuffer;
-    // Sort the objects by their distance from the screen
+    // Sort the objects by their distance from the screen for Depth Culling
     std::sort(objects.begin(), objects.end(),  [this](Object& obj1, Object& obj2) {
-        return compairObjectDistance(obj1, obj2);
+        return compairObjectDistance(&obj1, &obj2);
     });
     // Render all objects in scene
-    for(auto obj = objects.begin(); obj != objects.end(); obj++) {
-        renderObject(*obj);
+    for(std::vector<Object>::iterator obj = objects.begin(); obj != objects.end(); obj++) {
+        renderObject(&(*obj));
     }
 }

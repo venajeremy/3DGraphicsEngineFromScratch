@@ -2,8 +2,8 @@
 
 Application::Application()
 {
-    int resX = 360;
-    int resY = 225;
+    int resX = 720;
+    int resY = 550;
 	m_window = SDL_CreateWindow("SDL2 Window",
 			SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED,
