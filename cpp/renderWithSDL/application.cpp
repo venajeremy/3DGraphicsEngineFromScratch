@@ -7,6 +7,7 @@ Application::Application()
     int renderX = 288;
     int renderY = 162;
 
+
 	m_window = SDL_CreateWindow("SDL2 Window",
 			SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED,
@@ -36,7 +37,7 @@ Application::Application()
 
 
     // Create new world
-	newCamera = new World(m_render, (2*M_PI/6), renderX, renderY);
+	newCamera = new World(m_render, (2*M_PI/6), renderX, renderY, true);
 
     //Object grass("grass",0,0,100,0,0,0);
     //newCamera->addObject(grass);
@@ -44,8 +45,8 @@ Application::Application()
     Object phone("phone",0,100,100,0,0,0);
     newCamera->addObject(phone);
     
-    //Object sword("sword",0,500,100,0,0,0);
-    //newCamera->addObject(sword);
+    Object sword("sword",0,500,100,0,0,0);
+    newCamera->addObject(sword);
 
     
     

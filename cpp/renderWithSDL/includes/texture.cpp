@@ -68,15 +68,21 @@ pixel tgaReadPixel (const std::string tgaFile, float percentX, float percentY){
 
     tgaImage *inImage = decompressTGA(tgaFile);
 
+    // UV mappings are centered at the bottom left apparently!
     percentY = 1.0-percentY;
 
     size_t bytesPerPixel = inImage->bpp / 8;
     uint16_t x = (uint16_t)(inImage->width * percentX);
     uint16_t y = (uint16_t)(inImage->height * percentY);
-    x = (x>inImage->width) ? inImage->width : x;
+
+    // Edge (pun) cases on coloring pixels outside of the texture 
+    // Use the closest color on the edge if outside
+
+    x = (x>inImage->width) ? inImage->width-1 : x;
     x = (x<0) ? 0 : x;
-    y = (y>inImage->height) ? inImage->height : y;
+    y = (y>inImage->height-1) ? inImage->height-1 : y;
     y = (y<0) ? 0 : y;
+
     uint8_t r;
     uint8_t g;
     uint8_t b;

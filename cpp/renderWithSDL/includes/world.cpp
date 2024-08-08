@@ -1,7 +1,7 @@
 #include "world.hpp"
 #include "object.hpp"
 
-World::World(SDL_Renderer *inputRenderer, float inputCameraFov, int displayX, int displayY){
+World::World(SDL_Renderer *inputRenderer, float inputCameraFov, int displayX, int displayY, bool enableDepthCulling){
 	renderer = inputRenderer;
 	cameraFov = inputCameraFov;
 	disX = displayX;
@@ -13,6 +13,9 @@ World::World(SDL_Renderer *inputRenderer, float inputCameraFov, int displayX, in
     // Initialize zBuffers
     emptyBuffer.assign(displayX*displayY,-1);
     zBuffer = emptyBuffer;
+
+    // Enable Depth Culling
+    depthCulling = enableDepthCulling;
 
 	movementSpeed = 2.0f;
 	cameraX = 0.0f;
@@ -115,25 +118,27 @@ void World::renderTriPolygon(float x1, float y1, float z1,
         // Find the current zbuffer distances at the 3 verticies of the current triangle and see if our verticies would be closer to the camera
         // If the current verticies are not visible to the camera and behind an object rendered this frame do not draw the rest of the triangle
         // This optimization is more effective if every object in the scene is sorted by its distance from the camera
-        if(screenX1 > 0 && screenX1 < disX && screenY1 > 0 && screenY1 < disY){
-            currZ1 = zBuffer[(((screenY1-1)*disX)+screenX1)-1];
-        } else {
-            currZ1 = -1;
-        }
-        if(screenX2 > 0 && screenX2 < disX && screenY2 > 0 && screenY2 < disY){
-            currZ2 = zBuffer[(((screenY2-1)*disX)+screenX2)-1];
-        } else {
-            currZ2 = -1;
-        }
-        if(screenX3 > 0 && screenX3 < disX && screenY3 > 0 && screenY3 < disY){
-            currZ3 = zBuffer[(((screenY3-1)*disX)+screenX3)-1];
-        } else {
-            currZ3 = -1;
-        }
-        if((z1>currZ1+1 && currZ1 != -1)
-        && (z2>currZ2+1 && currZ2 != -1)
-        && (z3>currZ3+1 && currZ3 != -1)){
-            return;
+        if(depthCulling){
+            if(screenX1 > 0 && screenX1 < disX && screenY1 > 0 && screenY1 < disY){
+                currZ1 = zBuffer[(((screenY1-1)*disX)+screenX1)-1];
+            } else {
+                currZ1 = -1;
+            }
+            if(screenX2 > 0 && screenX2 < disX && screenY2 > 0 && screenY2 < disY){
+                currZ2 = zBuffer[(((screenY2-1)*disX)+screenX2)-1];
+            } else {
+                currZ2 = -1;
+            }
+            if(screenX3 > 0 && screenX3 < disX && screenY3 > 0 && screenY3 < disY){
+                currZ3 = zBuffer[(((screenY3-1)*disX)+screenX3)-1];
+            } else {
+                currZ3 = -1;
+            }
+            if((z1>currZ1+1 && currZ1 != -1)
+            && (z2>currZ2+1 && currZ2 != -1)
+            && (z3>currZ3+1 && currZ3 != -1)){
+                return;
+            }
         }
 
         // ---------------- BEGIN RASTERIZATION -----------------
@@ -361,10 +366,12 @@ void World::renderWorld()
 {
     // Clear the Zbuffer
     zBuffer=emptyBuffer;
-    // Sort the objects by their distance from the screen for Depth Culling
-    std::sort(objects.begin(), objects.end(),  [this](Object& obj1, Object& obj2) {
-        return compairObjectDistance(&obj1, &obj2);
-    });
+    if(depthCulling){
+        // Sort the objects by their distance from the screen for Depth Culling
+        std::sort(objects.begin(), objects.end(),  [this](Object& obj1, Object& obj2) {
+            return compairObjectDistance(&obj1, &obj2);
+        });
+    }
     // Render all objects in scene
     for(std::vector<Object>::iterator obj = objects.begin(); obj != objects.end(); obj++) {
         renderObject(&(*obj));

@@ -12,7 +12,7 @@
 class World
 {
 public:
-	World(SDL_Renderer *inputRenderer, float inputCameraFov, int displayX, int displayY);
+	World(SDL_Renderer *inputRenderer, float inputCameraFov, int displayX, int displayY, bool enableDepthCulling);
 
 	void handleInput(SDL_Event const &event);
 
@@ -53,6 +53,8 @@ private:
     std::string textureFolderLocation;
 
     tgaImage dTex;
+
+    bool depthCulling;
 
     float currZ1;
     float currZ2;
