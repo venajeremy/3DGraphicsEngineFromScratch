@@ -26,7 +26,7 @@ https://github.com/user-attachments/assets/9d4aa576-04ab-4941-ba8a-2275db5969b5
 
 ## Compilation:
 
-### build.txt includes GNU compilation commands for windows and linux to include the SDL2 libraries.  SDL2 will have to be configured beforehand.
+### build.txt includes g++ compilation commands for windows and linux to include the SDL2 libraries.  SDL2 will have to be configured beforehand.
 
 ### New obj objects can be added by including the obj and mtl files within the objects folder following the same naming scheme as the already present objects.  Same goes for textures.  This renderer so far only supports triangle polygons, so before importing your own object load it into blender and triangulate all faces by pressing ctrl-t while in edit mode.  Once the files are properly included create an Object object with the file name its world position and its rotation into the cpp/renderWithSDL/application.cpp default constructor.  Then add the Object to the World by called the world's addObject Method (see the blocks I have already created to form the default world).  Lastly save the application.cpp file and recompile the engine using the build.txt commands.
 
